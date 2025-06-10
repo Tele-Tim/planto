@@ -1,0 +1,13 @@
+package planto_project.service;
+
+import org.springframework.stereotype.Service;
+import planto_project.dto.ProductDto;
+
+@Service
+public interface ProductService {
+    ProductDto createProduct(ProductDto productDto);
+
+    ProductDto getProduct(String id);
+
+    ProductDto updateProduct(String id, ProductDto productDto);
+}

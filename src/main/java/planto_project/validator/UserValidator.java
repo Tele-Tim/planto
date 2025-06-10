@@ -41,7 +41,6 @@ public class UserValidator {
     }
 
     public void updateFields(UserAccount user, UpdateUserDto updateUserDto) {
-
         updateField(updateUserDto.getFirstName(), user.getFirstName(), user::setFirstName);
         updateField(updateUserDto.getLastName(), user.getLastName(), user::setLastName);
         updateField(updateUserDto.getEmail(), user.getEmail(), user::setEmail);
