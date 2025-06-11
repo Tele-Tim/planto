@@ -10,4 +10,8 @@ public interface ProductService {
     ProductDto getProduct(String id);
 
     ProductDto updateProduct(String id, ProductDto productDto);
+
+    ProductDto deleteProduct(String id);
+
+    ProductDto changeQuantityOfProduct(String id, int amount, boolean flag);
 }

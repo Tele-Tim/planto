@@ -1,5 +1,6 @@
 package planto_project.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.CommandLineRunner;
@@ -63,6 +64,7 @@ public class UserServiceImpl implements UserService, CommandLineRunner {
     }
 
     @Override
+    @Transactional
     public RolesOfUserDto changeRolesList(String login, String role, boolean isAddRole) {
         UserAccount user = accountRepository.findUserByLogin(login);
         if (isAddRole) {
@@ -81,6 +83,7 @@ public class UserServiceImpl implements UserService, CommandLineRunner {
 
 
     @Override
+    @Transactional
     public void changePassword(String login, String newPassword) {
         UserAccount user = accountRepository.findUserByLogin(login);
         String password = passwordEncoder.encode(newPassword);
@@ -89,6 +92,7 @@ public class UserServiceImpl implements UserService, CommandLineRunner {
     }
 
     @Override
+    @Transactional
     public UserDto updateUser(String login, UpdateUserDto updateUserDto) {
         UserAccount user = accountRepository.findUserByLogin(login);
         userValidator.updateFields(user, updateUserDto);
@@ -97,6 +101,7 @@ public class UserServiceImpl implements UserService, CommandLineRunner {
     }
 
     @Override
+    @Transactional
     public UserDto removeUser(String login) {
         UserAccount user = accountRepository.findUserByLogin(login);
         accountRepository.delete(user);

@@ -21,7 +21,11 @@ public class SecurityConfiguration {
         // todo out in production
         http.csrf(csrf -> csrf.disable());
         http.authorizeHttpRequests(authorize -> authorize
-
+                .requestMatchers(HttpMethod.DELETE, "/product/**")
+                .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
+                .requestMatchers(HttpMethod.PUT, "/product/update/**")
+                .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
+                .requestMatchers(HttpMethod.GET, "/product/**").permitAll()
                 .requestMatchers("/product/create")
                 .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
                 .requestMatchers("/account/register").permitAll()
@@ -34,7 +38,7 @@ public class SecurityConfiguration {
                 .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
                 .requestMatchers(HttpMethod.DELETE, "/account/user/{login}/role/{role}")
                 .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
-                                .anyRequest().authenticated());
+                .anyRequest().authenticated());
         return http.build();
     }
 }

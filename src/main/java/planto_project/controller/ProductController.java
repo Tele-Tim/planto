@@ -21,8 +21,25 @@ public class ProductController {
         return productService.getProduct(id);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ProductDto updateProduct(@PathVariable String id, @RequestBody ProductDto productDto) {
         return productService.updateProduct(id, productDto);
     }
+
+    @PutMapping("/update/{id}/add-quantity/{amount}")
+    public ProductDto AddQuantityOfProduct(@PathVariable String id, @PathVariable int amount) {
+        return productService.changeQuantityOfProduct(id, amount, true);
+    }
+
+    @PutMapping("/update/{id}/reduce-quantity/{amount}")
+    public ProductDto ReduceQuantityOfProduct(@PathVariable String id, @PathVariable int amount) {
+        return productService.changeQuantityOfProduct(id, amount, false);
+    }
+
+    @DeleteMapping("/{id}")
+    public ProductDto deleteProduct(@PathVariable String id) {
+        return productService.deleteProduct(id);
+    }
+
+
 }

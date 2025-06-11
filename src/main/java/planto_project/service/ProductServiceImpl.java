@@ -1,5 +1,6 @@
 package planto_project.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -30,9 +31,26 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public ProductDto updateProduct(String id, ProductDto productDto) {
         Product product = productRepository.findProductById(id);
         productValidator.updateFields(product, productDto);
+        productRepository.save(product);
+        return modelMapper.map(product, ProductDto.class);
+    }
+
+    @Override
+    @Transactional
+    public ProductDto deleteProduct(String id) {
+        Product product = productRepository.removeProductById(id);
+        return modelMapper.map(product, ProductDto.class);
+    }
+
+    @Override
+    @Transactional
+    public ProductDto changeQuantityOfProduct(String id, int amount, boolean flag) {
+        Product product = productRepository.findProductById(id);
+        product.changeQuantity(amount, flag);
         productRepository.save(product);
         return modelMapper.map(product, ProductDto.class);
     }

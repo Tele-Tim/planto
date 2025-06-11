@@ -5,4 +5,6 @@ import planto_project.model.Product;
 
 public interface ProductRepository extends MongoRepository<Product, String> {
     Product findProductById(String id);
+
+    Product removeProductById(String id);
 }
