@@ -14,6 +14,7 @@ public class UserDto {
     String firstName;
     String lastName;
     String email;
+    AddressDto address;
     @Singular
     Set<Role> roles;
 }

@@ -21,6 +21,8 @@ public class SecurityConfiguration {
         // todo out in production
         http.csrf(csrf -> csrf.disable());
         http.authorizeHttpRequests(authorize -> authorize
+                .requestMatchers(HttpMethod.POST, "/order/{login}")
+                .access(new WebExpressionAuthorizationManager("authentication.name == #login"))
                 .requestMatchers(HttpMethod.DELETE, "/product/**")
                 .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
                 .requestMatchers(HttpMethod.PUT, "/product/update/**")

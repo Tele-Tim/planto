@@ -13,19 +13,19 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class Product {
     @Id
-    String id;
+    private String id;
     @Setter
-    String name;
+    private String name;
     @Setter
-    String category;
+    private String category;
     @Setter
-    String description;
+    private String description;
     @Setter
-    BigDecimal price;
+    private BigDecimal price;
     @Setter
-    String imageUrl;
+    private String imageUrl;
     @Setter
-    Integer quantity;
+    private Integer quantity;
 
     public Integer changeQuantity(Integer amount, boolean isAddition) {
         if (amount <= 0) {
