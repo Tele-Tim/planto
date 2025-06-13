@@ -14,7 +14,6 @@ import java.util.Set;
 @Setter
 @Builder
 @AllArgsConstructor
-
 @Document(collection = "orders")
 public class Order {
     @Id

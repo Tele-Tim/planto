@@ -21,8 +21,17 @@ public class SecurityConfiguration {
         // todo out in production
         http.csrf(csrf -> csrf.disable());
         http.authorizeHttpRequests(authorize -> authorize
+                // order
                 .requestMatchers(HttpMethod.POST, "/order/{login}")
                 .access(new WebExpressionAuthorizationManager("authentication.name == #login"))
+                .requestMatchers(HttpMethod.GET, "/order/{login}/**")
+                .access(new WebExpressionAuthorizationManager("authentication.name == #login or hasRole('ADMINISTRATOR')"))
+                .requestMatchers(HttpMethod.PUT, "/order/{login}/**")
+                .access(new WebExpressionAuthorizationManager("authentication.name == #login or hasRole('ADMINISTRATOR')"))
+                .requestMatchers(HttpMethod.DELETE, "/order/{login}/**")
+                .access(new WebExpressionAuthorizationManager("authentication.name == #login or hasRole('ADMINISTRATOR')"))
+
+                // product
                 .requestMatchers(HttpMethod.DELETE, "/product/**")
                 .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
                 .requestMatchers(HttpMethod.PUT, "/product/update/**")
@@ -30,6 +39,8 @@ public class SecurityConfiguration {
                 .requestMatchers(HttpMethod.GET, "/product/**").permitAll()
                 .requestMatchers("/product/create")
                 .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
+
+                // account
                 .requestMatchers("/account/register").permitAll()
                 .requestMatchers(HttpMethod.PUT, "/account/user/{login}")
                 .access(new WebExpressionAuthorizationManager("authentication.name == #login"))
