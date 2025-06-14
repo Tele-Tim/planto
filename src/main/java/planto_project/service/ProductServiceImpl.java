@@ -9,6 +9,9 @@ import planto_project.dto.ProductDto;
 import planto_project.model.Product;
 import planto_project.validator.ProductValidator;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
@@ -55,5 +58,10 @@ public class ProductServiceImpl implements ProductService {
         return modelMapper.map(product, ProductDto.class);
     }
 
-
+    @Override
+    public Set<ProductDto> findAllProducts() {
+        return productRepository.findAll().stream()
+                .map(p -> modelMapper.map(p, ProductDto.class))
+                .collect(Collectors.toSet());
+    }
 }
