@@ -33,13 +33,18 @@ public class SecurityConfiguration {
 
                 // product
                 .requestMatchers(HttpMethod.DELETE, "/product/**")
-                .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
+//                TODO change, when auth in front will be ready
+//                .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
+                .permitAll()
                 .requestMatchers(HttpMethod.PUT, "/product/update/**")
-                .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
+//                TODO change, when auth in front will be ready
+//                .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
+                .permitAll()
                 .requestMatchers(HttpMethod.GET, "/product/**").permitAll()
                 .requestMatchers("/product/create")
-                .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
-
+//                TODO change, when auth in front will be ready
+//                .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
+                .permitAll()
                 // account
                 .requestMatchers("/account/register").permitAll()
                 .requestMatchers(HttpMethod.PUT, "/account/user/{login}")

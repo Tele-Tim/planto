@@ -1,13 +1,14 @@
 package planto_project.service;
 
 import org.springframework.stereotype.Service;
+import planto_project.dto.NewProductDto;
 import planto_project.dto.ProductDto;
 
 import java.util.Set;
 
 @Service
 public interface ProductService {
-    ProductDto createProduct(ProductDto productDto);
+    ProductDto createProduct(NewProductDto newProductDto);
 
     ProductDto getProduct(String id);
 

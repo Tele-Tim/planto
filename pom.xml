@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>java57</groupId>
-    <artifactId>planto_project</artifactId>
+    <artifactId>01_planto_project</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>01_planto_project</name>
     <description>01_planto_project</description>

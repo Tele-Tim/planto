@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import planto_project.dao.ProductRepository;
+import planto_project.dto.NewProductDto;
 import planto_project.dto.ProductDto;
 import planto_project.model.Product;
 import planto_project.validator.ProductValidator;
@@ -21,8 +22,8 @@ public class ProductServiceImpl implements ProductService {
 
 
     @Override
-    public ProductDto createProduct(ProductDto productDto) {
-        Product product = modelMapper.map(productDto, Product.class);
+    public ProductDto createProduct(NewProductDto newProductDto) {
+        Product product = modelMapper.map(newProductDto, Product.class);
         productRepository.save(product);
         return modelMapper.map(product, ProductDto.class);
     }
