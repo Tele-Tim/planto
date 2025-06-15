@@ -11,7 +11,6 @@ import java.util.Set;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/product")
-//@CrossOrigin(origins = {"http://localhost:5173"}, methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS})
 public class ProductController {
     final ProductService productService;
 
@@ -22,7 +21,6 @@ public class ProductController {
 
     @GetMapping()
     public Set<ProductDto> findAllProducts() {
-        System.out.println("All right");
         return productService.findAllProducts();
     }
 
