@@ -2,16 +2,19 @@ FROM openjdk:17-jdk-slim AS builder
 
 WORKDIR /app
 
+RUN apt-get update && \
+    apt-get install -y maven
+
 COPY pom.xml .
 
-RUN mvn dependecy:go-offline -B
+RUN mvn dependency:go-offline -B
 
 COPY src ./src
 
 RUN mvn clean package -DskipTest
 
 
-FROM openjdk:17-jre-slim
+FROM openjdk:17-jdk-slim
 
 WORKDIR /app
 
