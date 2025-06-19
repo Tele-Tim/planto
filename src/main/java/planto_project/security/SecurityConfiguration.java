@@ -18,7 +18,7 @@ import java.util.Arrays;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-public class SecurityConfiguration{
+public class SecurityConfiguration {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -54,16 +54,18 @@ public class SecurityConfiguration{
                 // account
                 .requestMatchers("/account/register").permitAll()
                 //todo only for ADMINISTRATOR
-                .requestMatchers("/account/users").permitAll()
-                .requestMatchers(HttpMethod.PUT, "/account/user/{login}")
-                .access(new WebExpressionAuthorizationManager("authentication.name == #login"))
-                .requestMatchers(HttpMethod.DELETE, "/account/user/{login}")
-                .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')" +
-                        "or authentication.name == #login"))
-                .requestMatchers(HttpMethod.PUT, "/account/user/{login}/role/{role}")
-                .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
-                .requestMatchers(HttpMethod.DELETE, "/account/user/{login}/role/{role}")
-                .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
+                .requestMatchers("/account/**").permitAll()
+
+//                TODO change, when auth in front will be ready
+//                .requestMatchers(HttpMethod.PUT, "/account/user/{login}")
+//                .access(new WebExpressionAuthorizationManager("authentication.name == #login"))
+//                .requestMatchers(HttpMethod.DELETE, "/account/user/{login}")
+//                .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')" +
+//                        "or authentication.name == #login"))
+//                .requestMatchers(HttpMethod.PUT, "/account/user/{login}/role/{role}")
+//                .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
+//                .requestMatchers(HttpMethod.DELETE, "/account/user/{login}/role/{role}")
+//                .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
                 .anyRequest().authenticated());
         return http.build();
     }
