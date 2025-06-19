@@ -18,6 +18,7 @@ import planto_project.model.UserAccount;
 import planto_project.validator.UserValidator;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -79,6 +80,13 @@ public class UserServiceImpl implements UserService, CommandLineRunner {
     @Override
     public UserDto getUser(String login) {
         return accountRepository.getUserAccountByLogin(login);
+    }
+
+    @Override
+    public Set<UserDto> findAllUsers() {
+        return accountRepository.findAll().stream()
+                .map(u -> modelMapper.map(u, UserDto.class))
+                .collect(Collectors.toSet());
     }
 
 

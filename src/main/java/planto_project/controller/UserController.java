@@ -10,6 +10,7 @@ import planto_project.dto.UserRegisterDto;
 import planto_project.service.UserService;
 
 import java.security.Principal;
+import java.util.Set;
 
 @RequiredArgsConstructor
 @RestController
@@ -20,6 +21,11 @@ public class UserController {
     @PostMapping("/register")
     public UserDto register(@RequestBody UserRegisterDto userRegisterDto) {
         return userService.register(userRegisterDto);
+    }
+
+    @GetMapping("users")
+    public Set<UserDto> findAllUsers() {
+        return userService.findAllUsers();
     }
 
    @GetMapping("user/{login}")

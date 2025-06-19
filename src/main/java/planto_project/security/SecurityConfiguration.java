@@ -53,6 +53,8 @@ public class SecurityConfiguration{
                 .permitAll()
                 // account
                 .requestMatchers("/account/register").permitAll()
+                //todo only for ADMINISTRATOR
+                .requestMatchers("/account/users").permitAll()
                 .requestMatchers(HttpMethod.PUT, "/account/user/{login}")
                 .access(new WebExpressionAuthorizationManager("authentication.name == #login"))
                 .requestMatchers(HttpMethod.DELETE, "/account/user/{login}")

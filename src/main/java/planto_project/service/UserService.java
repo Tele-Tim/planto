@@ -5,6 +5,8 @@ import planto_project.dto.UpdateUserDto;
 import planto_project.dto.UserDto;
 import planto_project.dto.UserRegisterDto;
 
+import java.util.Set;
+
 
 public interface UserService {
     UserDto register(UserRegisterDto userRegisterDto);
@@ -20,4 +22,6 @@ public interface UserService {
     RolesOfUserDto changeRolesList(String login, String role, boolean b);
 
     UserDto getUser(String login);
+
+    Set<UserDto> findAllUsers();
 }
