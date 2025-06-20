@@ -55,7 +55,7 @@ public class SecurityConfiguration {
                 .requestMatchers("/account/register").permitAll()
                 //todo only for ADMINISTRATOR
                 .requestMatchers(HttpMethod.GET,"/account/**").permitAll()
-
+//
 //                TODO change, when auth in front will be ready
 //                .requestMatchers(HttpMethod.PUT, "/account/user/{login}")
 //                .access(new WebExpressionAuthorizationManager("authentication.name == #login"))
