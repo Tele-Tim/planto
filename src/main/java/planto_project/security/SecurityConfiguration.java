@@ -54,7 +54,7 @@ public class SecurityConfiguration {
                 // account
                 .requestMatchers("/account/register").permitAll()
                 //todo only for ADMINISTRATOR
-                .requestMatchers("/account/**").permitAll()
+                .requestMatchers(HttpMethod.GET,"/account/**").permitAll()
 
 //                TODO change, when auth in front will be ready
 //                .requestMatchers(HttpMethod.PUT, "/account/user/{login}")
