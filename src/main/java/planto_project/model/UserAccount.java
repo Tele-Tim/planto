@@ -36,17 +36,22 @@ public class UserAccount {
         roles.add(Role.USER);
     }
 
-    public UserAccount(String login, String firstName,
-                       String lastName, String email,
-                       String password) {
+    public UserAccount(String login, Address address, String password, String email, String lastName, String firstName, List<Order> orders) {
         this();
         this.login = login;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
+        this.address = address;
         this.password = password;
-
+        this.email = email;
+        this.lastName = lastName;
+        this.firstName = firstName;
+        this.orders = orders;
     }
+
+    public UserAccount(String login, String password) {
+        this.login = login;
+        this.password = password;
+    }
+
 
     public boolean addRole(String role) {
         if (roles == null) {

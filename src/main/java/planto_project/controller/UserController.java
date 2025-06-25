@@ -23,14 +23,14 @@ public class UserController {
         return userService.register(userRegisterDto);
     }
 
+    @GetMapping("user/{login}")
+    public UserDto findUserByLogin(@PathVariable String login) {
+        return userService.findUserByLogin(login);
+    }
+
     @GetMapping("users")
     public Set<UserDto> findAllUsers() {
         return userService.findAllUsers();
-    }
-
-   @GetMapping("user/{login}")
-    public UserDto findUserByLogin(@PathVariable String login) {
-        return userService.findUserByLogin(login);
     }
 
     @PutMapping("user/{login}")
@@ -57,10 +57,5 @@ public class UserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void changePassword(Principal principal, @RequestHeader("X-Password") String newPassword) {
         userService.changePassword(principal.getName(), newPassword);
-    }
-
-    @PostMapping("/login")
-    public UserDto login(Principal principal) {
-        return userService.getUser(principal.getName());
     }
 }

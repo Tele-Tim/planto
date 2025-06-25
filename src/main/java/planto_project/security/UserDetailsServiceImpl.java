@@ -18,13 +18,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     final AccountRepository accountRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserAccount user = accountRepository.findById(username)
-                .orElseThrow(()-> new UsernameNotFoundException(username));
-        Collection<String> authorities = user.getRoles().stream()
+    public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
+        UserAccount user = accountRepository.findById(login)
+                .orElseThrow(() -> new UsernameNotFoundException(login));
+        Collection<String> roles = user.getRoles().stream()
                 .map(r -> "ROLE_" + r.name())
                 .toList();
-        return new User(username, user.getPassword(),
-                AuthorityUtils.createAuthorityList(authorities));
+        return new User(login, user.getPassword(), AuthorityUtils.createAuthorityList(roles));
     }
 }

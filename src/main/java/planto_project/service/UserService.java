@@ -21,7 +21,5 @@ public interface UserService {
 
     RolesOfUserDto changeRolesList(String login, String role, boolean b);
 
-    UserDto getUser(String login);
-
     Set<UserDto> findAllUsers();
 }

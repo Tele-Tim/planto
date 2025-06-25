@@ -21,22 +21,22 @@ public class Order {
     private List<OrderItem> items;
     private OrderStatus status;
     private LocalDateTime orderDate;
-    private Address shippingAddress;
     private String paymentMethod;
     private boolean paid;
+    private UserAccount user;
 
     public Order() {
         status = OrderStatus.PENDING;
     }
 
     public Order(List<OrderItem> items, LocalDateTime orderDate,
-                 Address shippingAddress, String paymentMethod, boolean paid) {
+                 String paymentMethod, boolean paid, UserAccount user) {
         this();
         this.items = items;
         this.orderDate = orderDate;
-        this.shippingAddress = shippingAddress;
         this.paymentMethod = paymentMethod;
         this.paid = paid;
+        this.user = user;
     }
 
     public BigDecimal calculateTotalPrice() {

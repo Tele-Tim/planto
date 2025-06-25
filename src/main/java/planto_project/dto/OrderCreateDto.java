@@ -1,7 +1,8 @@
 package planto_project.dto;
 
-import lombok.*;
-import planto_project.model.OrderItem;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import planto_project.model.OrderStatus;
 
 import java.time.LocalDateTime;
@@ -14,17 +15,18 @@ public class OrderCreateDto {
     private List<OrderItemDto> items;
     private OrderStatus status;
     private LocalDateTime orderDate;
-    private AddressDto shippingAddress;
     private String paymentMethod;
     private boolean paid;
+    private UserDto user;
 
     public OrderCreateDto(List<OrderItemDto> items, OrderStatus status,
-                          LocalDateTime orderDate, AddressDto shippingAddress, String paymentMethod, boolean paid) {
+                          LocalDateTime orderDate, String paymentMethod,
+                          boolean paid, UserDto user) {
         this.items = items;
         this.status = status;
         this.orderDate = orderDate;
-        this.shippingAddress = shippingAddress;
         this.paymentMethod = paymentMethod;
         this.paid = paid;
+        this.user = user;
     }
 }

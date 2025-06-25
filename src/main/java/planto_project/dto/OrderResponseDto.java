@@ -16,8 +16,8 @@ public class OrderResponseDto {
     private List<OrderItemDto> items;
     private OrderStatus status;
     private LocalDateTime orderDate;
-    private String shippingAddress;
     private String paymentMethod;
     private boolean paid;
+    private UserDto user;
 }
 

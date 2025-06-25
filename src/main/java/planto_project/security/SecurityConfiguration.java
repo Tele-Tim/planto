@@ -1,14 +1,21 @@
 package planto_project.security;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -18,57 +25,91 @@ import java.util.Arrays;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfiguration {
 
-    @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.cors(Customizer.withDefaults());
-        http.httpBasic(Customizer.withDefaults());
-        // todo out in production
-        http.csrf(csrf -> csrf.disable());
-        http.authorizeHttpRequests(authorize -> authorize
-                // order
-                .requestMatchers(HttpMethod.POST, "/order/{login}")
-                .access(new WebExpressionAuthorizationManager("authentication.name == #login"))
-                .requestMatchers(HttpMethod.GET, "/order/{login}/**")
-                .access(new WebExpressionAuthorizationManager("authentication.name == #login or hasRole('ADMINISTRATOR')"))
-                .requestMatchers(HttpMethod.PUT, "/order/{login}/**")
-                .access(new WebExpressionAuthorizationManager("authentication.name == #login or hasRole('ADMINISTRATOR')"))
-                .requestMatchers(HttpMethod.DELETE, "/order/{login}/**")
-                .access(new WebExpressionAuthorizationManager("authentication.name == #login or hasRole('ADMINISTRATOR')"))
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final UserDetailsServiceImpl userDetailsService;
+    private final JwtAuthEntryPoint jwtAuthEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
-                // product
-                .requestMatchers(HttpMethod.DELETE, "/product/**")
-//                TODO change, when auth in front will be ready
-//                .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
-                .permitAll()
-                .requestMatchers(HttpMethod.PUT, "/product/update/**")
-//                TODO change, when auth in front will be ready
-//                .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
-                .permitAll()
-                .requestMatchers(HttpMethod.GET, "/product/**").permitAll()
-                .requestMatchers("/product/create")
-//                TODO change, when auth in front will be ready
-//                .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
-                .permitAll()
-                // account
-                .requestMatchers("/account/register").permitAll()
-                //todo only for ADMINISTRATOR
-                .requestMatchers(HttpMethod.GET,"/account/**").permitAll()
-//
-//                TODO change, when auth in front will be ready
-//                .requestMatchers(HttpMethod.PUT, "/account/user/{login}")
-//                .access(new WebExpressionAuthorizationManager("authentication.name == #login"))
-//                .requestMatchers(HttpMethod.DELETE, "/account/user/{login}")
-//                .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')" +
-//                        "or authentication.name == #login"))
-//                .requestMatchers(HttpMethod.PUT, "/account/user/{login}/role/{role}")
-//                .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
-//                .requestMatchers(HttpMethod.DELETE, "/account/user/{login}/role/{role}")
-//                .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
-                .anyRequest().authenticated());
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .cors(cors -> cors.disable())
+                .csrf(csrf -> csrf.disable())
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(jwtAuthEntryPoint)
+                        .accessDeniedHandler(customAccessDeniedHandler))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(authorize -> authorize
+
+                       // authentication endpoints
+                        .requestMatchers("/auth/login").permitAll()
+
+                        // account endpoints
+                        .requestMatchers("/account/register").permitAll()
+                        .requestMatchers("/account/users")
+                        .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
+                        .requestMatchers(HttpMethod.GET, "/account/user/{login}")
+                        .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR') or authentication.name == #login"))
+                        .requestMatchers(HttpMethod.DELETE, "/account/user/{login}")
+                        .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR') or authentication.name == #login"))
+                        .requestMatchers(HttpMethod.PUT, "/account/user/{login}")
+                        .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR') or authentication.name == #login"))
+                        .requestMatchers(HttpMethod.PUT, "/account/user/{login}/role/{role}")
+                        .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
+                        .requestMatchers(HttpMethod.DELETE, "/account/user/{login}/role/{role}")
+                        .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
+
+                        // product endpoints
+                        .requestMatchers(HttpMethod.GET, "/product", "/product/**").permitAll()
+                        .requestMatchers("/product/create")
+                        .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
+                        .requestMatchers(HttpMethod.DELETE, "/product/{productId}")
+                        .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
+                        .requestMatchers(HttpMethod.PUT, "/product/**")
+                        .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
+
+                        // order endpoints
+                        .requestMatchers(HttpMethod.POST, "/order/create/{login}")
+                        .access(new WebExpressionAuthorizationManager("authentication.name == #login"))
+                        .requestMatchers(HttpMethod.GET, "/order/{login}/**")
+                        .access(new WebExpressionAuthorizationManager("authentication.name == #login or hasRole('ADMINISTRATOR')"))
+                        .requestMatchers(HttpMethod.PUT, "/order/{login}/**")
+                        .access(new WebExpressionAuthorizationManager("authentication.name == #login or hasRole('ADMINISTRATOR')"))
+                        .requestMatchers(HttpMethod.DELETE, "/order/{login}/**")
+                        .access(new WebExpressionAuthorizationManager("authentication.name == #login or hasRole('ADMINISTRATOR')"))
+                        .requestMatchers("/orders")
+                        .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
+
+                        // for other requests
+                        .anyRequest().authenticated());
+
+        http.authenticationProvider(authenticationProvider());
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
+
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
