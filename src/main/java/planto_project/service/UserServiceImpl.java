@@ -93,13 +93,6 @@ public class UserServiceImpl implements UserService, CommandLineRunner {
                 .collect(Collectors.toSet());
     }
 
-    @Override
-    public Set<UserDto> findAllUsers() {
-        return accountRepository.findAll().stream()
-                .map(u -> modelMapper.map(u, UserDto.class))
-                .collect(Collectors.toSet());
-    }
-
 
     @Override
     @Transactional
