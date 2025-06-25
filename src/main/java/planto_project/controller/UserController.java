@@ -10,6 +10,7 @@ import planto_project.dto.UserRegisterDto;
 import planto_project.service.UserService;
 
 import java.security.Principal;
+import java.util.Set;
 
 @RequiredArgsConstructor
 @RestController
@@ -22,9 +23,14 @@ public class UserController {
         return userService.register(userRegisterDto);
     }
 
-   @GetMapping("user/{login}")
+    @GetMapping("user/{login}")
     public UserDto findUserByLogin(@PathVariable String login) {
         return userService.findUserByLogin(login);
+    }
+
+    @GetMapping("users")
+    public Set<UserDto> findAllUsers() {
+        return userService.findAllUsers();
     }
 
     @PutMapping("user/{login}")
@@ -51,10 +57,5 @@ public class UserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void changePassword(Principal principal, @RequestHeader("X-Password") String newPassword) {
         userService.changePassword(principal.getName(), newPassword);
-    }
-
-    @PostMapping("/login")
-    public UserDto login(Principal principal) {
-        return userService.getUser(principal.getName());
     }
 }

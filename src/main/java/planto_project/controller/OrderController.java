@@ -5,7 +5,11 @@ import org.springframework.data.domain.jaxb.SpringDataJaxb;
 import org.springframework.web.bind.annotation.*;
 import planto_project.dto.OrderCreateDto;
 import planto_project.dto.OrderResponseDto;
+import planto_project.dto.OrderUpdateDto;
 import planto_project.service.OrderService;
+
+import java.util.List;
+import java.util.Set;
 
 @RequiredArgsConstructor
 @RestController
@@ -14,19 +18,25 @@ public class OrderController {
     final OrderService orderService;
 
 
-    @PostMapping("/{login}")
+    @PostMapping("create/{login}")
     public OrderCreateDto createOrder(@PathVariable String login, @RequestBody OrderCreateDto orderCreateDto) {
         return orderService.createOrder(login, orderCreateDto);
     }
 
-    @GetMapping("/{login}/{orderId}")
-    public OrderResponseDto findOrder(@PathVariable String orderId) {
-        return orderService.findOrderById(orderId);
+    @GetMapping("/orders")
+    public Set<OrderResponseDto> findAllOrders() {
+        return orderService.findAllOrders();
     }
 
+    @GetMapping("/{login}")
+    public List<OrderResponseDto> findAllOrdersOfUser(@PathVariable String login) {
+        return orderService.findAllOrdersOfUser(login);
+    }
+
+
     @PutMapping("/{login}/{orderId}")
-    public OrderResponseDto updateOrder(@PathVariable String orderId, @RequestBody OrderCreateDto orderCreateDto) {
-        return orderService.updateOrder(orderId, orderCreateDto);
+    public OrderResponseDto updateOrder(@PathVariable String orderId, @RequestBody OrderUpdateDto orderUpdateDto) {
+        return orderService.updateOrder(orderId, orderUpdateDto);
     }
 
     @DeleteMapping("/{login}/{orderId}")

@@ -3,6 +3,7 @@ package planto_project.dto;
 import lombok.*;
 import planto_project.model.Role;
 
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -10,11 +11,15 @@ import java.util.Set;
 @NoArgsConstructor
 @Builder
 public class UserDto {
-    String login;
-    String firstName;
-    String lastName;
-    String email;
-    AddressDto address;
+
+    private String login;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private AddressDto address;
     @Singular
-    Set<Role> roles;
+    private Set<Role> roles;
+    @Setter
+    private List<OrderResponseDto> orders;
+
 }

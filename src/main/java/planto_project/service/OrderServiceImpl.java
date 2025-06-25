@@ -8,12 +8,15 @@ import planto_project.dao.AccountRepository;
 import planto_project.dao.OrderRepository;
 import planto_project.dto.OrderCreateDto;
 import planto_project.dto.OrderResponseDto;
-import planto_project.model.Address;
+import planto_project.dto.OrderUpdateDto;
 import planto_project.model.Order;
 import planto_project.model.OrderItem;
 import planto_project.model.UserAccount;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,9 +32,9 @@ public class OrderServiceImpl implements OrderService {
         Order order = new Order(
                 orderCreateDto.getItems().stream().map(i -> modelMapper.map(i, OrderItem.class)).toList(),
                 LocalDateTime.now(),
-                user.getAddress(),
                 orderCreateDto.getPaymentMethod(),
-                false);
+                false,
+                user);
         return modelMapper.map(orderRepository.save(order), OrderCreateDto.class);
     }
 
@@ -42,12 +45,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderResponseDto updateOrder(String orderId, OrderCreateDto orderCreateDto) {
+    public OrderResponseDto updateOrder(String orderId, OrderUpdateDto orderUpdateDto) {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
-        if (orderCreateDto.getShippingAddress() != null) {
-            order.setShippingAddress(modelMapper.map(orderCreateDto.getShippingAddress(), Address.class));
-        }
-        order.setItems(orderCreateDto.getItems().stream()
+        order.setItems(orderUpdateDto.getItems().stream()
                 .map(i -> modelMapper.map(i, OrderItem.class)).toList());
         orderRepository.save(order);
         return modelMapper.map(order, OrderResponseDto.class);
@@ -58,5 +58,21 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
         orderRepository.delete(order);
         return modelMapper.map(order, OrderResponseDto.class);
+    }
+
+    @Override
+    public List<OrderResponseDto> findAllOrdersOfUser(String login) {
+//        UserAccount userAccount = accountRepository.findById(login).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+//        return orderRepository.findAllBy
+//
+//        userAccount.getOrders().forEach(i -> orderRepository.findById(i.getId()).orElseThrow(() -> new RuntimeException("Order not found")));
+        return List.of();
+    }
+
+    @Override
+    public Set<OrderResponseDto> findAllOrders() {
+        return orderRepository.findAll().stream()
+                .map(o -> modelMapper.map(o, OrderResponseDto.class))
+                .collect(Collectors.toSet());
     }
 }

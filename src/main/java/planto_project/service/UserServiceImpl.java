@@ -4,20 +4,22 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import planto_project.dao.AccountRepository;
-import planto_project.dto.RolesOfUserDto;
-import planto_project.dto.UpdateUserDto;
-import planto_project.dto.UserDto;
-import planto_project.dto.UserRegisterDto;
+import planto_project.dao.OrderRepository;
+import planto_project.dto.*;
 import planto_project.exceptions.EmailAlreadyExistException;
 import planto_project.exceptions.LoginAlreadyExistException;
+import planto_project.model.Order;
 import planto_project.model.Role;
 import planto_project.model.UserAccount;
 import planto_project.validator.UserValidator;
 
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -27,13 +29,14 @@ public class UserServiceImpl implements UserService, CommandLineRunner {
     final ModelMapper modelMapper;
     final UserValidator userValidator;
     final PasswordEncoder passwordEncoder;
+    final OrderRepository orderRepository;
 
     @Override
     public void run(String... args) throws Exception {
         if (!accountRepository.existsByRolesContaining(Set.of(Role.ADMINISTRATOR))) {
             String password = passwordEncoder.encode("1234");
             UserAccount user =
-                    new UserAccount("admin", "admin", "admin", "email@email.com", password);
+                    new UserAccount("admin", password);
             user.addRole(Role.ADMINISTRATOR.name());
             user.addRole(Role.MODERATOR.name());
             accountRepository.save(user);
@@ -59,8 +62,15 @@ public class UserServiceImpl implements UserService, CommandLineRunner {
 
     @Override
     public UserDto findUserByLogin(String login) {
-        UserAccount user = accountRepository.findUserByLogin(login);
-        return modelMapper.map(user, UserDto.class);
+        UserAccount user = accountRepository.findById(login).orElseThrow(() ->
+                new UsernameNotFoundException("User with name " + login + " not found"));
+        UserDto userDto = modelMapper.map(user, UserDto.class);
+        List<Order> orders = orderRepository.findAllByUser_Login(login);
+        List<OrderResponseDto> ordersDto = orders.stream()
+                .map(o -> modelMapper.map(o, OrderResponseDto.class))
+                .toList();
+        userDto.setOrders(ordersDto);
+        return userDto;
     }
 
     @Override
@@ -77,8 +87,10 @@ public class UserServiceImpl implements UserService, CommandLineRunner {
     }
 
     @Override
-    public UserDto getUser(String login) {
-        return accountRepository.getUserAccountByLogin(login);
+    public Set<UserDto> findAllUsers() {
+        return accountRepository.findAll().stream()
+                .map(u -> modelMapper.map(u, UserDto.class))
+                .collect(Collectors.toSet());
     }
 
 
@@ -107,6 +119,5 @@ public class UserServiceImpl implements UserService, CommandLineRunner {
         accountRepository.delete(user);
         return modelMapper.map(user, UserDto.class);
     }
-
 
 }
