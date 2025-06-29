@@ -2,11 +2,10 @@ package planto_project.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import planto_project.dto.RolesOfUserDto;
-import planto_project.dto.UpdateUserDto;
-import planto_project.dto.UserDto;
-import planto_project.dto.UserRegisterDto;
+import planto_project.dto.*;
+import planto_project.security.JwtUtil;
 import planto_project.service.UserService;
 
 import java.security.Principal;
@@ -17,10 +16,13 @@ import java.util.Set;
 @RequestMapping("/account")
 public class UserController {
     final UserService userService;
+    private final JwtUtil jwtUtil;
 
     @PostMapping("/register")
-    public UserDto register(@RequestBody UserRegisterDto userRegisterDto) {
-        return userService.register(userRegisterDto);
+    public ResponseEntity<AuthResponseDto> register(@RequestBody UserRegisterDto userRegisterDto) {
+        userService.register(userRegisterDto);
+        String token = jwtUtil.generateJwtToken(userRegisterDto.getLogin());
+        return ResponseEntity.ok(new AuthResponseDto(token));
     }
 
     @GetMapping("user/{login}")
