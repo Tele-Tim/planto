@@ -60,6 +60,7 @@ public class SecurityConfiguration {
                         .authenticationEntryPoint(jwtAuthEntryPoint)
                         .accessDeniedHandler(customAccessDeniedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
                 .authorizeHttpRequests(authorize -> authorize
 
                         // authentication endpoints
