@@ -12,12 +12,15 @@ import planto_project.dao.OrderRepository;
 import planto_project.dto.*;
 import planto_project.exceptions.EmailAlreadyExistException;
 import planto_project.exceptions.LoginAlreadyExistException;
+import planto_project.model.CartItem;
 import planto_project.model.Order;
 import planto_project.model.Role;
 import planto_project.model.UserAccount;
 import planto_project.validator.UserValidator;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -93,6 +96,58 @@ public class UserServiceImpl implements UserService, CommandLineRunner {
                 .collect(Collectors.toSet());
     }
 
+    @Override
+    public Set<CartItemDto> addToCart(String login, String productId) {
+        UserAccount user = accountRepository.findById(login)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        CartItem cartItem = new CartItem(productId);
+
+        if (user.getCart() == null) {
+            user.setCart(new HashSet<>());
+            user.getCart().add(cartItem);
+        } else {
+            if (!user.getCart().contains(cartItem)) {
+                user.getCart().add(cartItem);
+            } else {
+                user.getCart().stream()
+                        .findFirst()
+                        .ifPresent(CartItem::incrementItem);
+            }
+            accountRepository.save(user);
+        }
+
+        return user.getCart().stream()
+                .map(i -> modelMapper.map(i, CartItemDto.class))
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Set<CartItemDto> removeFromCart(String login, String productId) {
+        UserAccount user = accountRepository.findById(login)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.getCart() == null || user.getCart().isEmpty()) {
+            return Set.of();
+        }
+
+        Optional<CartItem> existingItem = user.getCart().stream()
+                .filter(item -> item.getProductId().equals(productId))
+                .findFirst();
+
+        existingItem.ifPresent(item -> {
+            if (item.getQuantity() > 1) {
+                item.decrementItem();
+            } else {
+                user.getCart().remove(item);
+            }
+        });
+
+        accountRepository.save(user);
+
+        return user.getCart().stream()
+                .map(i -> modelMapper.map(i, CartItemDto.class))
+                .collect(Collectors.toSet());
+    }
 
     @Override
     @Transactional
@@ -119,5 +174,4 @@ public class UserServiceImpl implements UserService, CommandLineRunner {
         accountRepository.delete(user);
         return modelMapper.map(user, UserDto.class);
     }
-
 }

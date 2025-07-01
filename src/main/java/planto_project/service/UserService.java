@@ -1,9 +1,7 @@
 package planto_project.service;
 
-import planto_project.dto.RolesOfUserDto;
-import planto_project.dto.UpdateUserDto;
-import planto_project.dto.UserDto;
-import planto_project.dto.UserRegisterDto;
+import planto_project.dto.*;
+import planto_project.model.CartItem;
 
 import java.util.Set;
 
@@ -22,4 +20,8 @@ public interface UserService {
     RolesOfUserDto changeRolesList(String login, String role, boolean b);
 
     Set<UserDto> findAllUsers();
+
+    Set<CartItemDto> addToCart(String login, String productId);
+
+    Set<CartItemDto> removeFromCart(String login, String productId);
 }

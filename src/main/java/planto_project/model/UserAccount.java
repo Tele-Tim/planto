@@ -30,13 +30,17 @@ public class UserAccount {
     private Address address;
     private Set<Role> roles;
     private List<Order> orders;
+    @Setter
+    private Set<CartItem> cart;
 
     public UserAccount() {
         roles = new HashSet<>();
         roles.add(Role.USER);
     }
 
-    public UserAccount(String login, Address address, String password, String email, String lastName, String firstName, List<Order> orders) {
+    public UserAccount(String login, Address address, String password,
+                       String email, String lastName, String firstName,
+                       List<Order> orders, Set<CartItem> cart) {
         this();
         this.login = login;
         this.address = address;
@@ -45,6 +49,7 @@ public class UserAccount {
         this.lastName = lastName;
         this.firstName = firstName;
         this.orders = orders;
+        this.cart = cart;
     }
 
     public UserAccount(String login, String password) {

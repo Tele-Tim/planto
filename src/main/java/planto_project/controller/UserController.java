@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import planto_project.dto.*;
+import planto_project.model.CartItem;
 import planto_project.security.JwtUtil;
 import planto_project.service.UserService;
 
@@ -60,4 +61,15 @@ public class UserController {
     public void changePassword(Principal principal, @RequestHeader("X-Password") String newPassword) {
         userService.changePassword(principal.getName(), newPassword);
     }
+
+    @PutMapping("/user/{login}/cart/{productId}")
+    public Set<CartItemDto> addToCart(@PathVariable String login, @PathVariable String productId) {
+        return userService.addToCart(login, productId);
+    }
+
+    @DeleteMapping("/user/{login}/cart/{productId}")
+    public Set<CartItemDto> removeFromCart(@PathVariable String login, @PathVariable String productId) {
+        return userService.removeFromCart(login, productId);
+    }
+
 }

@@ -21,5 +21,6 @@ public class UserDto {
     private Set<Role> roles;
     @Setter
     private List<OrderResponseDto> orders;
+    private Set<CartItemDto> cart;
 
 }
