@@ -22,5 +22,4 @@ public class UserDto {
     @Setter
     private List<OrderResponseDto> orders;
     private Set<CartItemDto> cart;
-
 }

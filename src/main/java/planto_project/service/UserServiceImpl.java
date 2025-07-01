@@ -100,21 +100,22 @@ public class UserServiceImpl implements UserService, CommandLineRunner {
     public Set<CartItemDto> addToCart(String login, String productId) {
         UserAccount user = accountRepository.findById(login)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        CartItem cartItem = new CartItem(productId);
 
         if (user.getCart() == null) {
             user.setCart(new HashSet<>());
-            user.getCart().add(cartItem);
-        } else {
-            if (!user.getCart().contains(cartItem)) {
-                user.getCart().add(cartItem);
-            } else {
-                user.getCart().stream()
-                        .findFirst()
-                        .ifPresent(CartItem::incrementItem);
-            }
-            accountRepository.save(user);
         }
+
+        Optional<CartItem> existingItem = user.getCart().stream()
+                .filter(item -> item.getProductId().equals(productId))
+                .findFirst();
+
+        if (existingItem.isPresent()) {
+           existingItem.get().incrementItem();
+        } else {
+          user.getCart().add(new CartItem(productId));
+        }
+
+        accountRepository.save(user);
 
         return user.getCart().stream()
                 .map(i -> modelMapper.map(i, CartItemDto.class))
