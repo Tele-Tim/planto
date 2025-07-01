@@ -158,6 +158,7 @@ public class UserServiceImpl implements UserService, CommandLineRunner {
         accountRepository.save(user);
     }
 
+
     @Override
     @Transactional
     public UserDto updateUser(String login, UpdateUserDto updateUserDto) {
