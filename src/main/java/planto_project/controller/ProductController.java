@@ -1,11 +1,14 @@
 package planto_project.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import planto_project.dto.NewProductDto;
 import planto_project.dto.ProductDto;
+import planto_project.dto.SortingDto;
 import planto_project.service.ProductService;
 
+import java.util.List;
 import java.util.Set;
 
 @RequiredArgsConstructor
@@ -19,9 +22,9 @@ public class ProductController {
         return productService.createProduct(newProductDto);
     }
 
-    @GetMapping()
-    public Set<ProductDto> findAllProducts() {
-        return productService.findAllProducts();
+    @PostMapping()
+    public Page<ProductDto> findAllProducts(@RequestBody SortingDto sortingDto) {
+        return productService.findAllProducts(sortingDto);
     }
 
     @GetMapping("/{id}")

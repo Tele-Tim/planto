@@ -1,9 +1,12 @@
 package planto_project.service;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import planto_project.dto.NewProductDto;
 import planto_project.dto.ProductDto;
+import planto_project.dto.SortingDto;
 
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -18,5 +21,5 @@ public interface ProductService {
 
     ProductDto changeQuantityOfProduct(String id, int amount, boolean flag);
 
-    Set<ProductDto> findAllProducts();
+    Page<ProductDto> findAllProducts(SortingDto sortingDto);
 }

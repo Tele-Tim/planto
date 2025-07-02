@@ -8,4 +8,6 @@ public class NewProductDto {
     String category;
     String quantity;
     String price;
+    String imageUrl;
+    String description;
 }
