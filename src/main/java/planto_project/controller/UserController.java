@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import planto_project.dao.AccountRepository;
 import planto_project.dto.*;
 import planto_project.model.CartItem;
+import planto_project.model.UserAccount;
 import planto_project.security.JwtUtil;
 import planto_project.service.UserService;
 
@@ -18,11 +20,14 @@ import java.util.Set;
 public class UserController {
     final UserService userService;
     private final JwtUtil jwtUtil;
+    private final AccountRepository accountRepository;
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponseDto> register(@RequestBody UserRegisterDto userRegisterDto) {
         userService.register(userRegisterDto);
-        String token = jwtUtil.generateJwtToken(userRegisterDto.getLogin());
+        UserAccount user = accountRepository.findById(userRegisterDto.getLogin()).orElseThrow( () ->
+                new RuntimeException("Account not found"));
+        String token = jwtUtil.generateJwtToken(userRegisterDto.getLogin(), user);
         return ResponseEntity.ok(new AuthResponseDto(token));
     }
 

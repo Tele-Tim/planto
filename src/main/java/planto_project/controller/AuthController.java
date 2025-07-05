@@ -10,8 +10,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import planto_project.dao.AccountRepository;
 import planto_project.dto.AuthRequestDto;
 import planto_project.dto.AuthResponseDto;
+import planto_project.model.UserAccount;
 import planto_project.security.JwtUtil;
 
 @RestController
@@ -19,6 +21,7 @@ import planto_project.security.JwtUtil;
 @RequiredArgsConstructor
 public class AuthController {
 
+    private final AccountRepository accountRepository;
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
@@ -30,7 +33,9 @@ public class AuthController {
         );
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(authRequestDto.getLogin());
-        String token = jwtUtil.generateJwtToken(userDetails.getUsername());
+        UserAccount user = accountRepository.findById(userDetails.getUsername()).orElseThrow( () ->
+                new RuntimeException("Account not found"));
+        String token = jwtUtil.generateJwtToken(userDetails.getUsername(), user);
         return ResponseEntity.ok(new AuthResponseDto(token));
     }
 }

@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import planto_project.model.UserAccount;
 
 import javax.crypto.SecretKey;
 import java.util.Base64;
@@ -45,11 +46,15 @@ public class JwtUtil {
         return cachedSigningKey;
     }
 
-    public String generateJwtToken(String username) {
+    public String generateJwtToken(String username, UserAccount user) {
+
         Date now = new Date();
         Date expiration = new Date(now.getTime() + jwtExpirationMs);
         return Jwts.builder()
                 .subject(username)
+                .claim("roles", user.getRoles().stream()
+                        .map(Enum::name)
+                        .toList())
                 .issuedAt(now)
                 .expiration(expiration)
                 .signWith(getSigningKey(), Jwts.SIG.HS512)
