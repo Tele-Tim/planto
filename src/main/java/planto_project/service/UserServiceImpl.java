@@ -9,13 +9,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import planto_project.dao.AccountRepository;
 import planto_project.dao.OrderRepository;
+import planto_project.dao.ProductRepository;
 import planto_project.dto.*;
 import planto_project.exceptions.EmailAlreadyExistException;
 import planto_project.exceptions.LoginAlreadyExistException;
-import planto_project.model.CartItem;
-import planto_project.model.Order;
-import planto_project.model.Role;
-import planto_project.model.UserAccount;
+import planto_project.model.*;
 import planto_project.validator.UserValidator;
 
 import java.util.HashSet;
@@ -33,6 +31,7 @@ public class UserServiceImpl implements UserService, CommandLineRunner {
     final UserValidator userValidator;
     final PasswordEncoder passwordEncoder;
     final OrderRepository orderRepository;
+    final ProductRepository productRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -100,6 +99,8 @@ public class UserServiceImpl implements UserService, CommandLineRunner {
     public Set<CartItemDto> addToCart(String login, String productId) {
         UserAccount user = accountRepository.findById(login)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
 
         if (user.getCart() == null) {
             user.setCart(new HashSet<>());
@@ -110,6 +111,9 @@ public class UserServiceImpl implements UserService, CommandLineRunner {
                 .findFirst();
 
         if (existingItem.isPresent()) {
+            if (existingItem.get().getQuantity() >= product.getQuantity()) {
+                throw new RuntimeException("Not enough items in stock");
+            }
            existingItem.get().incrementItem();
         } else {
           user.getCart().add(new CartItem(productId));
