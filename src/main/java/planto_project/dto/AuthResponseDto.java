@@ -7,5 +7,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class AuthResponseDto {
     private String accessToken;
-    private int expiresIn;
+    private long expiresIn;
 }

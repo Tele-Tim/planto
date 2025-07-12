@@ -1,5 +1,6 @@
 package planto_project.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,12 +24,10 @@ public class UserController {
     private final AccountRepository accountRepository;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponseDto> register(@RequestBody UserRegisterDto userRegisterDto) {
-        userService.register(userRegisterDto);
-        UserAccount user = accountRepository.findById(userRegisterDto.getLogin()).orElseThrow( () ->
-                new RuntimeException("Account not found"));
-        String token = jwtUtil.generateJwtToken(userRegisterDto.getLogin(), user);
-        return ResponseEntity.ok(new AuthResponseDto(token));
+    public ResponseEntity<AuthResponseDto> register(@RequestBody UserRegisterDto userRegisterDto,
+                                                    HttpServletResponse response) {
+        AuthResponseDto token = userService.register(userRegisterDto, response);
+        return ResponseEntity.ok(token);
     }
 
     @GetMapping("user/{login}")

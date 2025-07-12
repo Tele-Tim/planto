@@ -1,5 +1,6 @@
 package planto_project.service;
 
+import jakarta.servlet.http.HttpServletResponse;
 import planto_project.dto.*;
 import planto_project.model.CartItem;
 
@@ -7,7 +8,7 @@ import java.util.Set;
 
 
 public interface UserService {
-    UserDto register(UserRegisterDto userRegisterDto);
+    AuthResponseDto register(UserRegisterDto userRegisterDto, HttpServletResponse response);
 
     UserDto updateUser(String login, UpdateUserDto updateUserDto);
 

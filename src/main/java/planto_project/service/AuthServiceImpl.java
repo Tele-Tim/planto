@@ -10,8 +10,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Service;
 import planto_project.dao.AccountRepository;
 import planto_project.dao.RefreshTokenRepository;
-import planto_project.model.AuthRequest;
-import planto_project.model.AuthResponse;
+import planto_project.dto.AuthRequestDto;
+import planto_project.dto.AuthResponseDto;
 import planto_project.model.RefreshToken;
 import planto_project.model.UserAccount;
 import planto_project.security.JwtUtil;
@@ -30,21 +30,23 @@ public class AuthServiceImpl implements AuthService {
     private final JwtUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
 
+
     @Value("${app.jwt.refresh-token-expiration-days}")
     private int refreshTokenExpirationDays;
 
     @Value("${app.jwt.refresh-cookie-name}")
     private String refreshCookieName;
 
-    public AuthResponse login(AuthRequest authRequest, HttpServletResponse httpServletResponse) {
+    @Override
+    public AuthResponseDto login(AuthRequestDto authRequestDto, HttpServletResponse httpServletResponse) {
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(authRequest.getLogin(), authRequest.getPassword());
+                new UsernamePasswordAuthenticationToken(authRequestDto.getLogin(), authRequestDto.getPassword());
         authenticationManager.authenticate(authenticationToken);
 
-        UserAccount userAccount = accountRepository.findById(authRequest.getLogin())
+        UserAccount userAccount = accountRepository.findById(authRequestDto.getLogin())
                 .orElseThrow(() -> new RuntimeException("Account not found"));
 
-        String accessToken = jwtUtil.generateJwtToken(userAccount.getLogin(), userAccount);
+        String accessToken = jwtUtil.generateJwtToken(userAccount.getLogin());
         String refreshToken = jwtUtil.generateRefreshToken(userAccount.getLogin());
         String tokenHash = MyHasher.sha512Hex(refreshToken);
 
@@ -56,10 +58,11 @@ public class AuthServiceImpl implements AuthService {
                 .build());
 
         sendRefreshCookie(httpServletResponse, refreshToken);
-        return new AuthResponse(accessToken, jwtUtil.getJwtExpirationMs());
+        return new AuthResponseDto(accessToken, jwtUtil.getJwtExpirationMs());
     }
 
-    public AuthResponse refresh(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+    @Override
+    public AuthResponseDto refresh(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         Optional<String> refreshToken = extractRefreshTokenFromCookie(httpServletRequest);
         if (refreshToken.isEmpty()) {
             throw new RuntimeException("Refresh token not found");
@@ -77,7 +80,7 @@ public class AuthServiceImpl implements AuthService {
         UserAccount userAccount = accountRepository.findById(tokenFromRepository.getUserLogin())
                 .orElseThrow(() -> new RuntimeException("User account not found"));
 
-        String newAccessToken = jwtUtil.generateJwtToken(userAccount.getLogin(), userAccount);
+        String newAccessToken = jwtUtil.generateJwtToken(userAccount.getLogin());
         String newRefreshToken = jwtUtil.generateRefreshToken(userAccount.getLogin());
 
         tokenFromRepository.setRevoked(true);
@@ -92,9 +95,10 @@ public class AuthServiceImpl implements AuthService {
 
         sendRefreshCookie(httpServletResponse, newRefreshToken);
 
-        return new AuthResponse(newAccessToken, jwtUtil.getJwtExpirationMs());
+        return new AuthResponseDto(newAccessToken, jwtUtil.getJwtExpirationMs());
     }
 
+    @Override
     public void logout(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         Optional<String> refreshTokenFromCookie = extractRefreshTokenFromCookie(httpServletRequest);
         if (refreshTokenFromCookie.isEmpty()) {
@@ -116,15 +120,17 @@ public class AuthServiceImpl implements AuthService {
 
 
     private void sendRefreshCookie(HttpServletResponse httpServletResponse, String token) {
-        Cookie refreshCookie = new Cookie(refreshCookieName, token);
-        refreshCookie.setHttpOnly(true);
-        refreshCookie.setSecure(true);
-        refreshCookie.setPath("/auth/refresh");
-        refreshCookie.setMaxAge((int)
-                ChronoUnit.DAYS.getDuration().multipliedBy(refreshTokenExpirationDays).getSeconds()
-        );
-        //todo add refresh.setSameSite(true)
-        httpServletResponse.addCookie(refreshCookie);
+        int maxAge = (int) ChronoUnit.DAYS.getDuration()
+                .multipliedBy(refreshTokenExpirationDays).getSeconds();
+
+        String cookieValue = refreshCookieName + "=" + token +
+                "; Path=/auth/refresh" +
+                "; HttpOnly" +
+                "; Secure" +
+                "; SameSite=Strict" +
+                "; Max-Age=" + maxAge;
+
+        httpServletResponse.setHeader("Set-Cookie", cookieValue);
     }
 
     private Optional<String> extractRefreshTokenFromCookie(HttpServletRequest httpServletRequest) {
@@ -138,5 +144,6 @@ public class AuthServiceImpl implements AuthService {
         }
         return Optional.empty();
     }
+
 
 }
