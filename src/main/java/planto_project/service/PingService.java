@@ -10,7 +10,7 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 public class PingService {
     private final RestTemplate restTemplate = new RestTemplate();
-    private final String RENDER_URL = "https://planto-gp2i.onrender.com";
+    private final String RENDER_URL = "https://planto-gp2i.onrender.com/product";
 
     @PostConstruct
     public void init() {
