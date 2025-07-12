@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -19,11 +20,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-
-    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
@@ -42,47 +42,35 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         final String token = authHeader.substring(7);
-        String username = null;
+
+        String login;
 
         try {
-            username = jwtUtil.getUserNameFromJwtToken(token);
-            logger.debug("Username extracted from JWT: {}", username);
+            login = jwtUtil.extractSubjectFromToken(token);
         } catch (Exception e) {
-            logger.warn("Could not get username from JWT token, possibly invalid or malformed: {}", e.getMessage());
+            log.warn("Could not get username from JWT token, possibly invalid or malformed: {}", e.getMessage());
             filterChain.doFilter(request, response);
             return;
         }
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            logger.debug("Attempting to load UserDetails for username: {}", username);
-            UserDetails userDetails = null;
+        if (login != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             try {
-                userDetails = userDetailsService.loadUserByUsername(username);
-                logger.debug("UserDetails loaded for user: {}", username);
-            } catch (UsernameNotFoundException e) {
-                logger.warn("User '{}' not found in database: {}", username, e.getMessage());
-                filterChain.doFilter(request, response);
-                return;
+                UserDetails userDetails = userDetailsService.loadUserByUsername(login);
+                if (jwtUtil.validateJwtToken(token)) {
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                    log.debug("User '{}' authenticated via JWT.", login);
+                } else {
+                    log.warn("JWT token is invalid for user '{}'", login);
+                }
             } catch (Exception e) {
-                logger.error("An unexpected error occurred while loading UserDetails for '{}': {}", username, e.getMessage(), e);
-                filterChain.doFilter(request, response);
-                return;
+                log.error("Failed to authenticate user '{}': {}", login, e.getMessage(), e);
             }
-
-            if (jwtUtil.validateJwtToken(token)) {
-                logger.debug("JWT token validated for user: {}", username);
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
-                logger.info("User '{}' successfully authenticated and SecurityContext updated.", username);
-            } else {
-                logger.warn("JWT token is not valid for user '{}' after loading UserDetails.", username);
-            }
-        } else if (username != null && SecurityContextHolder.getContext().getAuthentication() != null) {
-            logger.debug("User '{}' is already authenticated. Skipping JWT processing for this request.", username);
-        } else {
-            logger.debug("Username from JWT was null or authentication already exists, skipping further JWT processing.");
         }
 
         filterChain.doFilter(request, response);

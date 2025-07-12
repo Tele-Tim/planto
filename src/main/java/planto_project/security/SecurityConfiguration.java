@@ -64,7 +64,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authorize -> authorize
 
                         // authentication endpoints
-                        .requestMatchers("/auth/login").permitAll()
+                        .requestMatchers("/auth/login", "/auth/refresh", "auth/logout").permitAll()
 
                         // account endpoints
                         .requestMatchers("/account/register").permitAll()

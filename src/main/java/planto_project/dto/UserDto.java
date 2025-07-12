@@ -1,10 +1,9 @@
 package planto_project.dto;
-
-import lombok.*;
-import planto_project.model.Role;
-
 import java.util.List;
 import java.util.Set;
+import lombok.*;
+import planto_project.model.Role;
+import planto_project.dto.AddressDto;
 
 @Getter
 @AllArgsConstructor

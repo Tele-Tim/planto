@@ -1,8 +1,11 @@
 package planto_project.service;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -10,12 +13,17 @@ import org.springframework.stereotype.Service;
 import planto_project.dao.AccountRepository;
 import planto_project.dao.OrderRepository;
 import planto_project.dao.ProductRepository;
+import planto_project.dao.RefreshTokenRepository;
 import planto_project.dto.*;
 import planto_project.exceptions.EmailAlreadyExistException;
 import planto_project.exceptions.LoginAlreadyExistException;
 import planto_project.model.*;
+import planto_project.security.JwtUtil;
+import planto_project.security.MyHasher;
 import planto_project.validator.UserValidator;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -26,15 +34,24 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService, CommandLineRunner {
-    final AccountRepository accountRepository;
-    final ModelMapper modelMapper;
-    final UserValidator userValidator;
-    final PasswordEncoder passwordEncoder;
-    final OrderRepository orderRepository;
-    final ProductRepository productRepository;
+    private final AccountRepository accountRepository;
+    private final ModelMapper modelMapper;
+    private final UserValidator userValidator;
+    private final PasswordEncoder passwordEncoder;
+    private final OrderRepository orderRepository;
+    private final ProductRepository productRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final JwtUtil jwtUtil;
+
+
+    @Value("${app.jwt.refresh-token-expiration-days}")
+    private int refreshTokenExpirationDays;
+
+    @Value("${app.jwt.refresh-cookie-name}")
+    private String refreshCookieName;
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         if (!accountRepository.existsByRolesContaining(Set.of(Role.ADMINISTRATOR))) {
             String password = passwordEncoder.encode("1234");
             UserAccount user =
@@ -46,20 +63,41 @@ public class UserServiceImpl implements UserService, CommandLineRunner {
     }
 
     @Override
-    public UserDto register(UserRegisterDto userRegisterDto) {
+    public AuthResponseDto register(UserRegisterDto userRegisterDto, HttpServletResponse response) {
         userValidator.checkLogin(userRegisterDto.getLogin());
         userValidator.checkEmail(userRegisterDto.getEmail());
-        if (accountRepository.existsByLogin((userRegisterDto.getLogin()))) {
+
+        if (accountRepository.existsByLogin(userRegisterDto.getLogin())) {
             throw new LoginAlreadyExistException();
         }
+
         if (accountRepository.existsByEmail(userRegisterDto.getEmail())) {
             throw new EmailAlreadyExistException();
         }
+
         UserAccount user = modelMapper.map(userRegisterDto, UserAccount.class);
-        String password = passwordEncoder.encode(userRegisterDto.getPassword());
-        user.setPassword(password);
+        user.setPassword(passwordEncoder.encode(userRegisterDto.getPassword()));
         accountRepository.save(user);
-        return modelMapper.map(user, UserDto.class);
+
+        String accessToken = jwtUtil.generateJwtToken(user.getLogin());
+        String refreshToken = jwtUtil.generateRefreshToken(user.getLogin());
+        String tokenHash = MyHasher.sha512Hex(refreshToken);
+
+        refreshTokenRepository.save(RefreshToken.builder()
+                .tokenHash(tokenHash)
+                .expiryDate(Instant.now().plus(refreshTokenExpirationDays, ChronoUnit.DAYS))
+                .revoked(false)
+                .userLogin(user.getLogin())
+                .build());
+
+        Cookie cookie = new Cookie(refreshCookieName, refreshToken);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/auth/refresh");
+        cookie.setMaxAge((int) ChronoUnit.DAYS.getDuration().multipliedBy(refreshTokenExpirationDays).getSeconds());
+        response.addCookie(cookie);
+
+        return new AuthResponseDto(accessToken, jwtUtil.getJwtExpirationMs());
     }
 
     @Override
@@ -114,9 +152,9 @@ public class UserServiceImpl implements UserService, CommandLineRunner {
             if (existingItem.get().getQuantity() >= product.getQuantity()) {
                 throw new RuntimeException("Not enough items in stock");
             }
-           existingItem.get().incrementItem();
+            existingItem.get().incrementItem();
         } else {
-          user.getCart().add(new CartItem(productId));
+            user.getCart().add(new CartItem(productId));
         }
 
         accountRepository.save(user);
