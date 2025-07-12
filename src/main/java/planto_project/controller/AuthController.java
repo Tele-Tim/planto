@@ -18,6 +18,7 @@ import planto_project.service.AuthService;
 public class AuthController {
     private final AuthService authService;
 
+
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDto>login(@RequestBody AuthRequestDto authRequestDto, HttpServletResponse response) {
         AuthResponseDto authResponseDto = authService.login(authRequestDto, response);
