@@ -30,7 +30,6 @@ public class AuthServiceImpl implements AuthService {
     private final JwtUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
 
-
     @Value("${app.jwt.refresh-token-expiration-days}")
     private int refreshTokenExpirationDays;
 
@@ -67,9 +66,11 @@ public class AuthServiceImpl implements AuthService {
         if (refreshToken.isEmpty()) {
             throw new RuntimeException("Refresh token not found");
         }
-
+        if (!jwtUtil.validateRefreshToken(refreshToken.get())) {
+            throw new RuntimeException("Invalid refresh token");
+        }
         String refreshTokenHash = MyHasher.sha512Hex(refreshToken.get());
-        RefreshToken tokenFromRepository = refreshTokenRepository.findByTokenHash(refreshTokenHash)
+                RefreshToken tokenFromRepository = refreshTokenRepository.findByTokenHash(refreshTokenHash)
                 .orElseThrow(() -> new RuntimeException("Refresh token not found"));
 
         if (tokenFromRepository.isRevoked() ||
@@ -93,6 +94,7 @@ public class AuthServiceImpl implements AuthService {
                 .userLogin(userAccount.getLogin())
                 .build());
 
+        clearRefreshCookie(httpServletResponse);
         sendRefreshCookie(httpServletResponse, newRefreshToken);
 
         return new AuthResponseDto(newAccessToken, jwtUtil.getJwtExpirationMs());
@@ -110,12 +112,17 @@ public class AuthServiceImpl implements AuthService {
             refreshTokenRepository.save(refreshToken);
         });
 
+        clearRefreshCookie(httpServletResponse);
+
+    }
+
+    private void clearRefreshCookie(HttpServletResponse response) {
         Cookie cookie = new Cookie(refreshCookieName, "");
         cookie.setHttpOnly(true);
         cookie.setSecure(true);
         cookie.setPath("/auth/refresh");
         cookie.setMaxAge(0);
-        httpServletResponse.addCookie(cookie);
+        response.addCookie(cookie);
     }
 
 
