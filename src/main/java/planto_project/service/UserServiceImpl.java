@@ -192,7 +192,7 @@ public class UserServiceImpl implements UserService, CommandLineRunner {
                 .collect(Collectors.toSet());
     }
 
-    @Override
+     @Override
     @Transactional
     public void changePassword(String login, String newPassword) {
         UserAccount user = accountRepository.findUserByLogin(login);

@@ -25,4 +25,5 @@ public interface UserService {
     Set<CartItemDto> addToCart(String login, String productId);
 
     Set<CartItemDto> removeFromCart(String login, String productId);
+
 }

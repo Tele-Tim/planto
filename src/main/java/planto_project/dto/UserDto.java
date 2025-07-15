@@ -1,9 +1,10 @@
 package planto_project.dto;
-import java.util.List;
-import java.util.Set;
+
 import lombok.*;
 import planto_project.model.Role;
-import planto_project.dto.AddressDto;
+
+import java.util.List;
+import java.util.Set;
 
 @Getter
 @AllArgsConstructor

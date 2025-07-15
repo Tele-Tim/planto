@@ -24,11 +24,6 @@ public class UserController {
         return ResponseEntity.ok(token);
     }
 
-    @GetMapping("user/{login}")
-    public UserDto findUserByLogin(@PathVariable String login) {
-        return userService.findUserByLogin(login);
-    }
-
     @GetMapping("users")
     public Set<UserDto> findAllUsers() {
         return userService.findAllUsers();
@@ -37,6 +32,11 @@ public class UserController {
     @PutMapping("user/{login}")
     public UserDto updateUser(@PathVariable String login, @RequestBody UpdateUserDto updateUserDto) {
         return userService.updateUser(login, updateUserDto);
+    }
+
+    @GetMapping("user/{login}")
+    public UserDto findUserByLogin(@PathVariable String login) {
+        return userService.findUserByLogin(login);
     }
 
     @DeleteMapping("user/{login}")
