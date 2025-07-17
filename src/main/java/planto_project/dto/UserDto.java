@@ -1,5 +1,6 @@
 package planto_project.dto;
 
+import org.jetbrains.annotations.Nullable;
 import lombok.*;
 import planto_project.model.Role;
 
@@ -16,6 +17,7 @@ public class UserDto {
     private String firstName;
     private String lastName;
     private String email;
+    @Nullable
     private AddressDto address;
     @Singular
     private Set<Role> roles;
