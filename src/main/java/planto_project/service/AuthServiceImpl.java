@@ -130,14 +130,23 @@ public class AuthServiceImpl implements AuthService {
         int maxAge = (int) ChronoUnit.DAYS.getDuration()
                 .multipliedBy(refreshTokenExpirationDays).getSeconds();
 
-        String cookieValue = refreshCookieName + "=" + token +
-                "; Path=/auth/refresh" +
-                "; HttpOnly" +
-                "; Secure" +
-                "; SameSite=Strict" +
-                "; Max-Age=" + maxAge;
+        Cookie cookie = new Cookie(refreshCookieName, token);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+//        cookie.setPath("/");
+        cookie.setPath("/auth/refresh");
+        cookie.setMaxAge(maxAge);
+//        cookie.setSameSite("Strict");
+        httpServletResponse.addCookie(cookie);
 
-        httpServletResponse.setHeader("Set-Cookie", cookieValue);
+//        String cookieValue = refreshCookieName + "=" + token +
+//                "; Path=/auth/refresh" +
+//                "; HttpOnly" +
+//                "; Secure" +
+//                "; SameSite=Strict" +
+//                "; Max-Age=" + maxAge;
+//
+//        httpServletResponse.setHeader("Set-Cookie", cookieValue);
     }
 
     private Optional<String> extractRefreshTokenFromCookie(HttpServletRequest httpServletRequest) {
