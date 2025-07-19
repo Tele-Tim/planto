@@ -119,7 +119,7 @@ public class AuthServiceImpl implements AuthService {
     private void clearRefreshCookie(HttpServletResponse response) {
         Cookie cookie = new Cookie(refreshCookieName, "");
         cookie.setHttpOnly(true);
-//        cookie.setSecure(true);
+        cookie.setSecure(true);
         cookie.setPath("/");
         cookie.setMaxAge(0);
         response.addCookie(cookie);
@@ -142,7 +142,7 @@ public class AuthServiceImpl implements AuthService {
         String cookieValue = refreshCookieName + "=" + token +
                 "; Path=/" +
                 "; HttpOnly" +
-//                "; Secure" +
+                "; Secure" +
 //                "; SameSite=None" +
                 "; SameSite=Lax" +
                 "; Max-Age=" + maxAge;
