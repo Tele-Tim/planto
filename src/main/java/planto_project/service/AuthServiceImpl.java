@@ -140,7 +140,7 @@ public class AuthServiceImpl implements AuthService {
 //        httpServletResponse.addCookie(cookie);
 
         String cookieValue = refreshCookieName + "=" + token +
-                "; Path=/auth/refresh" +
+                "; Path=/" +
                 "; HttpOnly" +
 //                "; Secure" +
 //                "; SameSite=None" +
