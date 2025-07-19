@@ -94,7 +94,7 @@ public class AuthServiceImpl implements AuthService {
                 .userLogin(userAccount.getLogin())
                 .build());
 
-//        clearRefreshCookie(httpServletResponse);
+        clearRefreshCookie(httpServletResponse);
         sendRefreshCookie(httpServletResponse, newRefreshToken);
 
         return new AuthResponseDto(newAccessToken, jwtUtil.getJwtExpirationMs());
@@ -120,7 +120,7 @@ public class AuthServiceImpl implements AuthService {
         Cookie cookie = new Cookie(refreshCookieName, "");
         cookie.setHttpOnly(true);
         cookie.setSecure(true);
-        cookie.setPath("/auth/refresh");
+        cookie.setPath("/");
         cookie.setMaxAge(0);
         response.addCookie(cookie);
     }
@@ -140,14 +140,14 @@ public class AuthServiceImpl implements AuthService {
 //        httpServletResponse.addCookie(cookie);
 
         String cookieValue = refreshCookieName + "=" + token +
-                "; Path=/auth/refresh" +
+                "; Path=/" +
                 "; HttpOnly" +
 //                "; Secure" +
 //                "; SameSite=None" +
                 "; SameSite=Lax" +
                 "; Max-Age=" + maxAge;
 
-        httpServletResponse.setHeader("Set-Cookie", cookieValue);
+        httpServletResponse.addHeader("Set-Cookie", cookieValue);
     }
 
     private Optional<String> extractRefreshTokenFromCookie(HttpServletRequest httpServletRequest) {
