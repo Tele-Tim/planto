@@ -94,7 +94,7 @@ public class AuthServiceImpl implements AuthService {
                 .userLogin(userAccount.getLogin())
                 .build());
 
-        clearRefreshCookie(httpServletResponse);
+//        clearRefreshCookie(httpServletResponse);
         sendRefreshCookie(httpServletResponse, newRefreshToken);
 
         return new AuthResponseDto(newAccessToken, jwtUtil.getJwtExpirationMs());
@@ -140,7 +140,7 @@ public class AuthServiceImpl implements AuthService {
 //        httpServletResponse.addCookie(cookie);
 
         String cookieValue = refreshCookieName + "=" + token +
-                "; Path=/" +
+                "; Path=/auth/refresh" +
                 "; HttpOnly" +
 //                "; Secure" +
 //                "; SameSite=None" +
