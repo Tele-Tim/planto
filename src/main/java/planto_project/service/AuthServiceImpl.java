@@ -70,7 +70,7 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("Invalid refresh token");
         }
         String refreshTokenHash = MyHasher.sha512Hex(refreshToken.get());
-                RefreshToken tokenFromRepository = refreshTokenRepository.findByTokenHash(refreshTokenHash)
+        RefreshToken tokenFromRepository = refreshTokenRepository.findByTokenHash(refreshTokenHash)
                 .orElseThrow(() -> new RuntimeException("Refresh token not found"));
 
         if (tokenFromRepository.isRevoked() ||
@@ -116,13 +116,23 @@ public class AuthServiceImpl implements AuthService {
 
     }
 
-    private void clearRefreshCookie(HttpServletResponse response) {
-        Cookie cookie = new Cookie(refreshCookieName, "");
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
+    private void clearRefreshCookie(HttpServletResponse httpServletResponse) {
+//        Cookie cookie = new Cookie(refreshCookieName, "");
+//        cookie.setHttpOnly(true);
+//        cookie.setSecure(true);
+//        cookie.setPath("/");
+//        cookie.setMaxAge(0);
+//        httpServletResponse.addCookie(cookie);
+
+        String cookieValue = refreshCookieName + "=" + "" +
+                "; Path=/" +
+                "; HttpOnly" +
+//                "; Secure" +
+                "; SameSite=Lax" +
+                "; Max-Age=0" ;
+        httpServletResponse.setHeader("Set-Cookie", cookieValue);
+
+
     }
 
 
@@ -142,12 +152,10 @@ public class AuthServiceImpl implements AuthService {
         String cookieValue = refreshCookieName + "=" + token +
                 "; Path=/" +
                 "; HttpOnly" +
-                "; Secure" +
-//                "; SameSite=None" +
+//                "; Secure" +
                 "; SameSite=Lax" +
                 "; Max-Age=" + maxAge;
-
-        httpServletResponse.addHeader("Set-Cookie", cookieValue);
+        httpServletResponse.setHeader("Set-Cookie", cookieValue);
     }
 
     private Optional<String> extractRefreshTokenFromCookie(HttpServletRequest httpServletRequest) {
