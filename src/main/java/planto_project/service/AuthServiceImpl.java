@@ -85,6 +85,7 @@ public class AuthServiceImpl implements AuthService {
         String newRefreshToken = jwtUtil.generateRefreshToken(userAccount.getLogin());
 
         tokenFromRepository.setRevoked(true);
+        refreshTokenRepository.save(tokenFromRepository);
 
         refreshTokenRepository.save(RefreshToken.builder()
                 .tokenHash(MyHasher.sha512Hex(newRefreshToken))
