@@ -85,7 +85,6 @@ public class AuthServiceImpl implements AuthService {
         String newRefreshToken = jwtUtil.generateRefreshToken(userAccount.getLogin());
 
         tokenFromRepository.setRevoked(true);
-        refreshTokenRepository.save(tokenFromRepository);
 
         refreshTokenRepository.save(RefreshToken.builder()
                 .tokenHash(MyHasher.sha512Hex(newRefreshToken))
@@ -129,7 +128,7 @@ public class AuthServiceImpl implements AuthService {
                 "; HttpOnly" +
                 "; Secure" +
                 "; SameSite=None" +
-                "; Max-Age=0" ;
+                "; Max-Age=0";
         httpServletResponse.setHeader("Set-Cookie", cookieValue);
 
 
