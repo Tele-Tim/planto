@@ -117,20 +117,20 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private void clearRefreshCookie(HttpServletResponse httpServletResponse) {
-        Cookie cookie = new Cookie(refreshCookieName, "");
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(0);
-        httpServletResponse.addCookie(cookie);
+//        Cookie cookie = new Cookie(refreshCookieName, "");
+//        cookie.setHttpOnly(true);
+//        cookie.setSecure(true);
+//        cookie.setPath("/");
+//        cookie.setMaxAge(0);
+//        httpServletResponse.addCookie(cookie);
 
-//        String cookieValue = refreshCookieName + "=" + "" +
-//                "; Path=/" +
-//                "; HttpOnly" +
+        String cookieValue = refreshCookieName + "=" + "" +
+                "; Path=/" +
+                "; HttpOnly" +
 //                "; Secure" +
-//                "; SameSite=None" +
-//                "; Max-Age=0";
-//        httpServletResponse.setHeader("Set-Cookie", cookieValue);
+                "; SameSite=None" +
+                "; Max-Age=0";
+        httpServletResponse.setHeader("Set-Cookie", cookieValue);
     }
 
 
@@ -138,20 +138,20 @@ public class AuthServiceImpl implements AuthService {
         int maxAge = (int) ChronoUnit.DAYS.getDuration()
                 .multipliedBy(refreshTokenExpirationDays).getSeconds();
 
-        Cookie cookie = new Cookie(refreshCookieName, token);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(maxAge);
-        httpServletResponse.addCookie(cookie);
+//        Cookie cookie = new Cookie(refreshCookieName, token);
+//        cookie.setHttpOnly(true);
+//        cookie.setSecure(true);
+//        cookie.setPath("/");
+//        cookie.setMaxAge(maxAge);
+//        httpServletResponse.addCookie(cookie);
 
-//        String cookieValue = refreshCookieName + "=" + token +
-//                "; Path=/" +
-//                "; HttpOnly" +
+        String cookieValue = refreshCookieName + "=" + token +
+                "; Path=/" +
+                "; HttpOnly" +
 //                "; Secure" +
-//                "; SameSite=None" +
-//                "; Max-Age=" + maxAge;
-//        httpServletResponse.setHeader("Set-Cookie", cookieValue);
+                "; SameSite=None" +
+                "; Max-Age=" + maxAge;
+        httpServletResponse.setHeader("Set-Cookie", cookieValue);
     }
 
     private Optional<String> extractRefreshTokenFromCookie(HttpServletRequest httpServletRequest) {
