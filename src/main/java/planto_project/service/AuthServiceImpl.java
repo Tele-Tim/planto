@@ -129,8 +129,7 @@ public class AuthServiceImpl implements AuthService {
                 "; HttpOnly" +
                 "; Secure" +
                 "; SameSite=None" +
-                "; Max-Age=0" +
-                "; Domain=planto-gp2i.onrender.com";
+                "; Max-Age=0";
         httpServletResponse.setHeader("Set-Cookie", cookieValue);
     }
 
@@ -151,8 +150,7 @@ public class AuthServiceImpl implements AuthService {
                 "; HttpOnly" +
                 "; Secure" +
                 "; SameSite=None" +
-                "; Max-Age=" + maxAge +
-                "; Domain=planto-gp2i.onrender.com";
+                "; Max-Age=" + maxAge;
         httpServletResponse.setHeader("Set-Cookie", cookieValue);
     }
 
