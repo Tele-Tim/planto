@@ -127,7 +127,7 @@ public class AuthServiceImpl implements AuthService {
         String cookieValue = refreshCookieName + "=" + "" +
                 "; Path=/" +
                 "; HttpOnly" +
-//                "; Secure" +
+                "; Secure" +
                 "; SameSite=None" +
                 "; Max-Age=0";
         httpServletResponse.setHeader("Set-Cookie", cookieValue);
@@ -148,7 +148,7 @@ public class AuthServiceImpl implements AuthService {
         String cookieValue = refreshCookieName + "=" + token +
                 "; Path=/" +
                 "; HttpOnly" +
-//                "; Secure" +
+                "; Secure" +
                 "; SameSite=None" +
                 "; Max-Age=" + maxAge;
         httpServletResponse.setHeader("Set-Cookie", cookieValue);
