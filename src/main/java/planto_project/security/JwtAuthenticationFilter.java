@@ -43,7 +43,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            logger.debug("No JWT token found in request or not a Bearer token.");
+            log.debug("No JWT token found in request or not a Bearer token.");
             filterChain.doFilter(request, response);
             return;
         }
