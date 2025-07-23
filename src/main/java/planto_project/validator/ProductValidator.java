@@ -26,6 +26,7 @@ public class ProductValidator {
         updateField(productDto.getCategory(), product.getCategory(), product::setCategory);
         updateField(productDto.getDescription(), product.getDescription(), product::setDescription);
         updateField(productDto.getImageUrl(), product.getImageUrl(), product::setImageUrl);
+        updateField(productDto.getQuantity(), product.getQuantity(), product::setQuantity);
         updateField(productDto.getPrice(), product.getPrice(), product::setPrice);
 
 
