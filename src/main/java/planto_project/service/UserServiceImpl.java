@@ -92,7 +92,7 @@ public class UserServiceImpl implements UserService, CommandLineRunner {
 
         Cookie cookie = new Cookie(refreshCookieName, refreshToken);
         cookie.setHttpOnly(true);
-        cookie.setSecure(true);
+        cookie.setSecure(false);
         cookie.setPath("/");
         cookie.setMaxAge((int) ChronoUnit.DAYS.getDuration().multipliedBy(refreshTokenExpirationDays).getSeconds());
         response.addCookie(cookie);

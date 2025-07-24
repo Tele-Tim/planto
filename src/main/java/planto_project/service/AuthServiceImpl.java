@@ -124,7 +124,6 @@ public class AuthServiceImpl implements AuthService {
 //        cookie.setMaxAge(0);
 //        httpServletResponse.addCookie(cookie);
 //
-//        System.out.println("Sending cookie: " + cookie);
 
         String cookieValue = refreshCookieName + "=" + "" +
                 "; Path=/" +
@@ -132,7 +131,10 @@ public class AuthServiceImpl implements AuthService {
                 "; Secure" +
                 "; SameSite=None" +
                 "; Max-Age=0";
+
         httpServletResponse.setHeader("Set-Cookie", cookieValue);
+
+        System.out.println("Sending cookie: " + cookieValue);
     }
 
 
@@ -154,9 +156,6 @@ public class AuthServiceImpl implements AuthService {
                 "; SameSite=None" +
                 "; Max-Age=" + maxAge;
         httpServletResponse.setHeader("Set-Cookie", cookieValue);
-
-//        System.out.println("Sending cookie: " + cookie);
-//
 
     }
 
