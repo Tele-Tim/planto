@@ -123,16 +123,15 @@ public class AuthServiceImpl implements AuthService {
 //        cookie.setPath("/");
 //        cookie.setMaxAge(0);
 //        httpServletResponse.addCookie(cookie);
+//
+//        System.out.println("Sending cookie: " + cookie);
 
         String cookieValue = refreshCookieName + "=" + "" +
                 "; Path=/" +
                 "; HttpOnly" +
-//                "; Secure" +
-                "; SameSite=lax" +
+                "; Secure" +
+                "; SameSite=None" +
                 "; Max-Age=0";
-
-        System.out.println("Sending cookie: " + cookieValue);
-
         httpServletResponse.setHeader("Set-Cookie", cookieValue);
     }
 
@@ -151,13 +150,14 @@ public class AuthServiceImpl implements AuthService {
         String cookieValue = refreshCookieName + "=" + token +
                 "; Path=/" +
                 "; HttpOnly" +
-//                "; Secure" +
-                "; SameSite=Lax" +
+                "; Secure" +
+                "; SameSite=None" +
                 "; Max-Age=" + maxAge;
-
-        System.out.println("Sending cookie: " + cookieValue);
-
         httpServletResponse.setHeader("Set-Cookie", cookieValue);
+
+//        System.out.println("Sending cookie: " + cookie);
+//
+
     }
 
     private Optional<String> extractRefreshTokenFromCookie(HttpServletRequest httpServletRequest) {
