@@ -119,17 +119,20 @@ public class AuthServiceImpl implements AuthService {
     private void clearRefreshCookie(HttpServletResponse httpServletResponse) {
 //        Cookie cookie = new Cookie(refreshCookieName, "");
 //        cookie.setHttpOnly(true);
-//        cookie.setSecure(true);
+//        cookie.setSecure(false);
 //        cookie.setPath("/");
 //        cookie.setMaxAge(0);
 //        httpServletResponse.addCookie(cookie);
 
         String cookieValue = refreshCookieName + "=" + "" +
-                "; Path=/auth/refresh" +
+                "; Path=/" +
                 "; HttpOnly" +
-                "; Secure" +
-                "; SameSite=None" +
+//                "; Secure" +
+                "; SameSite=lax" +
                 "; Max-Age=0";
+
+        System.out.println("Sending cookie: " + cookieValue);
+
         httpServletResponse.setHeader("Set-Cookie", cookieValue);
     }
 
@@ -140,17 +143,20 @@ public class AuthServiceImpl implements AuthService {
 
 //        Cookie cookie = new Cookie(refreshCookieName, token);
 //        cookie.setHttpOnly(true);
-//        cookie.setSecure(true);
+//        cookie.setSecure(false);
 //        cookie.setPath("/");
 //        cookie.setMaxAge(maxAge);
 //        httpServletResponse.addCookie(cookie);
 
         String cookieValue = refreshCookieName + "=" + token +
-                "; Path=/auth/refresh" +
+                "; Path=/" +
                 "; HttpOnly" +
-                "; Secure" +
-                "; SameSite=None" +
+//                "; Secure" +
+                "; SameSite=Lax" +
                 "; Max-Age=" + maxAge;
+
+        System.out.println("Sending cookie: " + cookieValue);
+
         httpServletResponse.setHeader("Set-Cookie", cookieValue);
     }
 
