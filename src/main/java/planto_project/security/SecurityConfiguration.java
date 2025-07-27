@@ -87,6 +87,7 @@ public class SecurityConfiguration {
 
                         // product endpoints
                         .requestMatchers(HttpMethod.GET, "/product", "/product/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/product").permitAll()
                         .requestMatchers("/product/create")
                         .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
                         .requestMatchers(HttpMethod.DELETE, "/product/{productId}")
