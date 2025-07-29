@@ -26,4 +26,5 @@ public interface UserService {
 
     Set<CartItemDto> removeFromCart(String login, String productId);
 
+    Set<CartItemDto> getCartOfUser(String login);
 }
