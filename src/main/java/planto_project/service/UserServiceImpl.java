@@ -202,6 +202,38 @@ public class UserServiceImpl implements UserService, CommandLineRunner {
     }
 
     @Override
+    public Set<CartItemDto> deleteProductFromCart(String login, String productId) {
+        UserAccount user = accountRepository.findById(login)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.getCart() == null || user.getCart().isEmpty()) {
+            return Set.of();
+        }
+
+        user.getCart().removeIf(i -> i.getProductId().equals(productId));
+
+        accountRepository.save(user);
+
+        return user.getCart().stream()
+                .map(i -> modelMapper.map(i, CartItemDto.class))
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public void clearUserCart(String login) {
+        UserAccount user = accountRepository.findById(login)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (user != null) {
+            Set<CartItem> userCart = user.getCart();
+            userCart.clear();
+            accountRepository.save(user);
+        } else {
+            throw new RuntimeException("User not found");
+        }
+
+    }
+
+    @Override
     @Transactional
     public void changePassword(String login, String newPassword) {
         UserAccount user = accountRepository.findUserByLogin(login);

@@ -84,8 +84,12 @@ public class SecurityConfiguration {
                         .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR') or authentication.name == #login"))
                         .requestMatchers(HttpMethod.PUT, "/user/{login}/cart/{productId}")
                         .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR') or authentication.name == #login"))
-                        .requestMatchers(HttpMethod.DELETE, "/user/{login}/cart/{productId}")
+                        .requestMatchers(HttpMethod.DELETE, "/user/{login}/cart/{productId}/**")
                         .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR') or authentication.name == #login"))
+                        .requestMatchers(HttpMethod.DELETE, "/user/{login}/cart/clear")
+                        .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR') or authentication.name == #login"))
+
+
 
                         // product endpoints
                         .requestMatchers(HttpMethod.GET, "/product", "/product/**").permitAll()
