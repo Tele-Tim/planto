@@ -14,7 +14,7 @@ import java.util.Set;
 
 @Getter
 @Document(collection = "users")
-@Builder
+
 @AllArgsConstructor
 public class UserAccount {
     @Id
@@ -52,9 +52,11 @@ public class UserAccount {
         this.cart = cart;
     }
 
-    public UserAccount(String login, String password) {
+    public UserAccount(String login, String password, List<Order> orders, Set<CartItem> cart) {
         this.login = login;
         this.password = password;
+        this.orders = orders;
+        this.cart = cart;
     }
 
 

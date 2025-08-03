@@ -24,10 +24,7 @@ import planto_project.validator.UserValidator;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -55,7 +52,7 @@ public class UserServiceImpl implements UserService, CommandLineRunner {
         if (!accountRepository.existsByRolesContaining(Set.of(Role.ADMINISTRATOR))) {
             String password = passwordEncoder.encode("1234");
             UserAccount user =
-                    new UserAccount("admin", password);
+                    new UserAccount("admin", password, new ArrayList<>(), new HashSet<>());
             user.addRole(Role.ADMINISTRATOR.name());
             user.addRole(Role.MODERATOR.name());
             accountRepository.save(user);
