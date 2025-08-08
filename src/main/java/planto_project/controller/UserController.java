@@ -60,6 +60,11 @@ public class UserController {
         userService.changePassword(principal.getName(), newPassword);
     }
 
+    @GetMapping("/user/{login}/cart")
+    public Set<CartItemDto> getCartOfUser(@PathVariable String login) {
+        return userService.getCartOfUser(login);
+    }
+
     @PutMapping("/user/{login}/cart/{productId}")
     public Set<CartItemDto> addToCart(@PathVariable String login, @PathVariable String productId) {
         return userService.addToCart(login, productId);
@@ -69,5 +74,16 @@ public class UserController {
     public Set<CartItemDto> removeFromCart(@PathVariable String login, @PathVariable String productId) {
         return userService.removeFromCart(login, productId);
     }
+
+    @DeleteMapping("/user/{login}/cart/{productId}/all")
+    public Set<CartItemDto> deleteProductFromCart(@PathVariable String login, @PathVariable String productId) {
+        return userService.deleteProductFromCart(login, productId);
+    }
+
+    @DeleteMapping("/user/{login}/cart/clear")
+    public void clearUserCart(@PathVariable String login) {
+        userService.clearUserCart(login);
+    }
+
 
 }

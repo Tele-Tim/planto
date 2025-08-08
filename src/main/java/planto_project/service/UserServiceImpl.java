@@ -24,10 +24,7 @@ import planto_project.validator.UserValidator;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -55,7 +52,7 @@ public class UserServiceImpl implements UserService, CommandLineRunner {
         if (!accountRepository.existsByRolesContaining(Set.of(Role.ADMINISTRATOR))) {
             String password = passwordEncoder.encode("1234");
             UserAccount user =
-                    new UserAccount("admin", password);
+                    new UserAccount("admin", password, new ArrayList<>(), new HashSet<>());
             user.addRole(Role.ADMINISTRATOR.name());
             user.addRole(Role.MODERATOR.name());
             accountRepository.save(user);
@@ -92,8 +89,8 @@ public class UserServiceImpl implements UserService, CommandLineRunner {
 
         Cookie cookie = new Cookie(refreshCookieName, refreshToken);
         cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setPath("/auth/refresh");
+        cookie.setSecure(false);
+        cookie.setPath("/");
         cookie.setMaxAge((int) ChronoUnit.DAYS.getDuration().multipliedBy(refreshTokenExpirationDays).getSeconds());
         response.addCookie(cookie);
 
@@ -192,7 +189,48 @@ public class UserServiceImpl implements UserService, CommandLineRunner {
                 .collect(Collectors.toSet());
     }
 
-     @Override
+    @Override
+    public Set<CartItemDto> getCartOfUser(String login) {
+        UserAccount user = accountRepository.findById(login)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return user.getCart().stream()
+                .map(i -> modelMapper.map(i, CartItemDto.class))
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Set<CartItemDto> deleteProductFromCart(String login, String productId) {
+        UserAccount user = accountRepository.findById(login)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.getCart() == null || user.getCart().isEmpty()) {
+            return Set.of();
+        }
+
+        user.getCart().removeIf(i -> i.getProductId().equals(productId));
+
+        accountRepository.save(user);
+
+        return user.getCart().stream()
+                .map(i -> modelMapper.map(i, CartItemDto.class))
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public void clearUserCart(String login) {
+        UserAccount user = accountRepository.findById(login)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (user != null) {
+            Set<CartItem> userCart = user.getCart();
+            userCart.clear();
+            accountRepository.save(user);
+        } else {
+            throw new RuntimeException("User not found");
+        }
+
+    }
+
+    @Override
     @Transactional
     public void changePassword(String login, String newPassword) {
         UserAccount user = accountRepository.findUserByLogin(login);

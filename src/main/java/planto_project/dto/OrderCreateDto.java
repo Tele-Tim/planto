@@ -18,15 +18,17 @@ public class OrderCreateDto {
     private String paymentMethod;
     private boolean paid;
     private UserDto user;
+    private String deliveryAddress;
+    private String deliveryMethod;
 
-    public OrderCreateDto(List<OrderItemDto> items, OrderStatus status,
-                          LocalDateTime orderDate, String paymentMethod,
-                          boolean paid, UserDto user) {
+    public OrderCreateDto(List<OrderItemDto> items, OrderStatus status, LocalDateTime orderDate, String paymentMethod, boolean paid, UserDto user, String deliveryAddress, String deliveryMethod) {
         this.items = items;
         this.status = status;
         this.orderDate = orderDate;
         this.paymentMethod = paymentMethod;
         this.paid = paid;
         this.user = user;
+        this.deliveryAddress = deliveryAddress;
+        this.deliveryMethod = deliveryMethod;
     }
 }
