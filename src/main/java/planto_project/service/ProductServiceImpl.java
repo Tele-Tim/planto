@@ -12,7 +12,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import planto_project.dao.ProductRepository;
 import planto_project.dto.*;
-import planto_project.dto.filters_dto.DataForFiltersDto;
+import planto_project.dto.filters_dto.DataForProductsFiltersDto;
 import planto_project.dto.filters_dto.FilterDoubleDto;
 import planto_project.dto.filters_dto.FilterDto;
 import planto_project.dto.filters_dto.FilterStringDto;
@@ -25,7 +25,7 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class ProductServiceImpl implements ProductService {
+public class ProductServiceImpl implements ProductService, DataServices, DataForFilters<DataForProductsFiltersDto> {
     final ProductRepository productRepository;
     final ModelMapper modelMapper;
     final ProductValidator productValidator;
@@ -71,11 +71,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Page<ProductDto> findAllProducts(SortingDto sortingDto) {
-
-        Sort.Direction direction = sortingDto.getDirection() > 0 ? Sort.Direction.ASC : Sort.Direction.DESC;
-        Pageable pageable = PageRequest.of(sortingDto.getPage(), sortingDto.getSize(), Sort.by(direction, sortingDto.getField().toLowerCase()));
-
-        return productRepository.findAll(pageable).map(p -> modelMapper.map(p, ProductDto.class));
+        return productRepository.findAll(getPageable(sortingDto)).map(p -> modelMapper.map(p, ProductDto.class));
     }
 
     @Override
@@ -139,12 +135,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public DataForFiltersDto getDataForFilters() {
+    public DataForProductsFiltersDto getDataForFilters() {
 
         BigDecimal maxPrice = productRepository.getTop1ByOrderByPriceDesc().getPrice();
         List<String> result = productRepository.groupByCategory(Sort.by("_id"));
 
-        return new DataForFiltersDto(maxPrice, result);
+        return new DataForProductsFiltersDto(maxPrice, result);
     }
 
 

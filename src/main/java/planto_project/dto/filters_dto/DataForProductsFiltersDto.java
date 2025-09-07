@@ -9,7 +9,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class DataForFiltersDto {
+public class DataForProductsFiltersDto {
     BigDecimal price;
     List<String> categories;
 }

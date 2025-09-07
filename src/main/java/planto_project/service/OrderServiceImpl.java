@@ -75,4 +75,29 @@ public class OrderServiceImpl implements OrderService {
                 .map(o -> modelMapper.map(o, OrderResponseDto.class))
                 .collect(Collectors.toSet());
     }
+
+    @Override
+    public Page<OrderResponseDto> finAllOrders(SortingDto sortingDto) {
+        return orderRepository.findAll(getPageable(sortingDto)).map(p -> modelMapper.map(p, OrderResponseDto.class));
+    }
+
+    @Override
+    public Page<OrderResponseDto> findAllOrdersWithCriteria(SortingDto sortingDto) {
+
+        Map<String, Filter<?>> filterMap = Map.ofEntries(
+                Map.entry("status", new Filter<String>()),
+                Map.entry("date", new Filter<LocalDate>()),
+                Map.entry("sum", new Filter<Double>()),
+                Map.entry("item", new Filter<String>())
+        );
+
+        Query query = getQueryWithCriteria(filterMap, sortingDto);
+
+        return orderRepository.findOrdersByQuery(query, getPageable(sortingDto));
+    }
+
+    @Override
+    public DataForOrdersFiltersDto getDataForFilters() {
+        return new DataForOrdersFiltersDto();
+    }
 }
