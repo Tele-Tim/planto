@@ -2,22 +2,30 @@ package planto_project.service;
 
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import planto_project.dao.AccountRepository;
 import planto_project.dao.OrderRepository;
 import planto_project.dto.OrderCreateDto;
 import planto_project.dto.OrderResponseDto;
-import planto_project.model.Address;
-import planto_project.model.Order;
-import planto_project.model.OrderItem;
-import planto_project.model.UserAccount;
+import planto_project.dto.SortingDto;
+import planto_project.dto.filters_dto.DataForOrdersFiltersDto;
+import planto_project.dto.filters_dto.FilterDto;
+import planto_project.model.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class OrderServiceImpl implements OrderService {
+public class OrderServiceImpl implements OrderService, DataServices, DataForFilters<DataForOrdersFiltersDto> {
     final AccountRepository accountRepository;
     final OrderRepository orderRepository;
     final ModelMapper modelMapper;
@@ -58,5 +66,30 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
         orderRepository.delete(order);
         return modelMapper.map(order, OrderResponseDto.class);
+    }
+
+    @Override
+    public Page<OrderResponseDto> finAllOrders(SortingDto sortingDto) {
+        return orderRepository.findAll(getPageable(sortingDto)).map(p -> modelMapper.map(p, OrderResponseDto.class));
+    }
+
+    @Override
+    public Page<OrderResponseDto> findAllOrdersWithCriteria(SortingDto sortingDto) {
+
+        Map<String, Filter<?>> filterMap = Map.ofEntries(
+                Map.entry("status", new Filter<String>()),
+                Map.entry("date", new Filter<LocalDate>()),
+                Map.entry("sum", new Filter<Double>()),
+                Map.entry("item", new Filter<String>())
+        );
+
+        Query query = getQueryWithCriteria(filterMap, sortingDto);
+
+        return orderRepository.findOrdersByQuery(query, getPageable(sortingDto));
+    }
+
+    @Override
+    public DataForOrdersFiltersDto getDataForFilters() {
+        return new DataForOrdersFiltersDto();
     }
 }

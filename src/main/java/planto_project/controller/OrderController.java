@@ -1,11 +1,16 @@
 package planto_project.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.jaxb.SpringDataJaxb;
+import org.apache.logging.log4j.util.PropertySource;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import planto_project.dto.OrderCreateDto;
 import planto_project.dto.OrderResponseDto;
+import planto_project.dto.SortingDto;
 import planto_project.service.OrderService;
+
+import java.util.Arrays;
+import java.util.Comparator;
 
 @RequiredArgsConstructor
 @RestController
@@ -34,4 +39,12 @@ public class OrderController {
         return orderService.removeOrder(orderId);
     }
 
+    @PostMapping("/all")
+    public Page<OrderResponseDto> findAllOrders(@RequestBody SortingDto sortingDto) {
+        if (sortingDto.getCriteria() != null
+                && !sortingDto.getCriteria().isEmpty()) {
+            return orderService.findAllOrdersWithCriteria(sortingDto);
+        }
+        return orderService.finAllOrders(sortingDto);
+    }
 }

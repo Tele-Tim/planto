@@ -1,21 +1,24 @@
 package planto_project.model;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import java.util.List;
 import java.util.regex.Pattern;
 
+@NoArgsConstructor
 @Getter
 @Setter
 public class Filter<T> {
-    private final String field;
-    private final Integer type;
+    private String field;
+    private Integer type;
     private T value;
     private T valueFrom;
     private T valueTo;
     private List<T> valueList;
+
 
     public Filter(String field, Integer type, T value) {
         this.field = field;

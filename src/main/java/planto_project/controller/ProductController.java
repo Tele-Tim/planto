@@ -3,7 +3,7 @@ package planto_project.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
-import planto_project.dto.filters_dto.DataForFiltersDto;
+import planto_project.dto.filters_dto.DataForProductsFiltersDto;
 import planto_project.dto.NewProductDto;
 import planto_project.dto.ProductDto;
 import planto_project.dto.SortingDto;
@@ -54,7 +54,7 @@ public class ProductController {
     }
 
     @GetMapping("/filterdata")
-    public DataForFiltersDto getDataForFilters() {
+    public DataForProductsFiltersDto getDataForFilters() {
         return productService.getDataForFilters();
     }
 }

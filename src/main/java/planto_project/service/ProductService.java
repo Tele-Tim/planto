@@ -2,7 +2,7 @@ package planto_project.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-import planto_project.dto.filters_dto.DataForFiltersDto;
+import planto_project.dto.filters_dto.DataForProductsFiltersDto;
 import planto_project.dto.NewProductDto;
 import planto_project.dto.ProductDto;
 import planto_project.dto.SortingDto;
@@ -23,5 +23,5 @@ public interface ProductService {
 
     Page<ProductDto> findAllProductsWithCriteria(SortingDto sortingDto);
 
-    DataForFiltersDto getDataForFilters();
+    DataForProductsFiltersDto getDataForFilters();
 }
