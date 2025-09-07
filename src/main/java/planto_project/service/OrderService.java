@@ -24,7 +24,7 @@ public interface OrderService {
 
     Set<OrderResponseDto> findAllOrders();
 
-    Page<OrderResponseDto> finAllOrders(SortingDto sortingDto);
+    Page<OrderResponseDto> findAllOrders(SortingDto sortingDto);
 
     Page<OrderResponseDto> findAllOrdersWithCriteria(SortingDto sortingDto);
 }

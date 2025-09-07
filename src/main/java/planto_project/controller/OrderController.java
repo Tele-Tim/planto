@@ -1,6 +1,7 @@
 package planto_project.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.jaxb.SpringDataJaxb;
 import org.springframework.web.bind.annotation.*;
 import planto_project.dto.OrderCreateDto;
@@ -51,6 +52,6 @@ public class OrderController {
                 && !sortingDto.getCriteria().isEmpty()) {
             return orderService.findAllOrdersWithCriteria(sortingDto);
         }
-        return orderService.finAllOrders(sortingDto);
+        return orderService.findAllOrders(sortingDto);
     }
 }
