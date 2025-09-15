@@ -70,11 +70,14 @@ public class OrderServiceImpl implements OrderService, DataServices, DataForFilt
 
     @Override
     public List<OrderResponseDto> findAllOrdersOfUser(String login) {
-//        UserAccount userAccount = accountRepository.findById(login).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-//        return orderRepository.findAllBy
-//
-//        userAccount.getOrders().forEach(i -> orderRepository.findById(i.getId()).orElseThrow(() -> new RuntimeException("Order not found")));
-        return List.of();
+        UserAccount userAccount = accountRepository.findById(login)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        List<Order> orders = orderRepository.findAllByUser_Login(userAccount.getLogin());
+
+        return orders.stream()
+                .map(order -> modelMapper.map(order, OrderResponseDto.class))
+                .toList();
     }
 
     @Override

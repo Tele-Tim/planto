@@ -73,6 +73,7 @@ public class UserServiceImpl implements UserService, CommandLineRunner {
         }
 
         UserAccount user = modelMapper.map(userRegisterDto, UserAccount.class);
+        user.setCart(new HashSet<>());
         user.setPassword(passwordEncoder.encode(userRegisterDto.getPassword()));
         accountRepository.save(user);
 
