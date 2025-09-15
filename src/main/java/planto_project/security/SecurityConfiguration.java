@@ -113,6 +113,11 @@ public class SecurityConfiguration {
                         .requestMatchers("/orders")
                         .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
 
+                        //images endpoint
+                        .requestMatchers("/uploadImage")
+                        .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
+
+
                         // for other requests
                         .anyRequest().authenticated());
 
