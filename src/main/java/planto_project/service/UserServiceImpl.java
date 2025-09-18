@@ -162,6 +162,7 @@ public class UserServiceImpl implements UserService, CommandLineRunner {
                 .collect(Collectors.toSet());
     }
 
+
     @Override
     public Set<CartItemDto> removeFromCart(String login, String productId) {
         UserAccount user = accountRepository.findById(login)
@@ -231,30 +232,33 @@ public class UserServiceImpl implements UserService, CommandLineRunner {
 
     }
 
-    @Override
-    @Transactional
-    public void changePassword(String login, String newPassword) {
-        UserAccount user = accountRepository.findUserByLogin(login);
-        String password = passwordEncoder.encode(newPassword);
-        user.setPassword(password);
-        accountRepository.save(user);
-    }
 
 
-    @Override
-    @Transactional
-    public UserDto updateUser(String login, UpdateUserDto updateUserDto) {
-        UserAccount user = accountRepository.findUserByLogin(login);
-        userValidator.updateFields(user, updateUserDto);
-        accountRepository.save(user);
-        return modelMapper.map(user, UserDto.class);
-    }
 
-    @Override
-    @Transactional
-    public UserDto removeUser(String login) {
-        UserAccount user = accountRepository.findUserByLogin(login);
-        accountRepository.delete(user);
-        return modelMapper.map(user, UserDto.class);
-    }
+@Override
+@Transactional
+public void changePassword(String login, String newPassword) {
+    UserAccount user = accountRepository.findUserByLogin(login);
+    String password = passwordEncoder.encode(newPassword);
+    user.setPassword(password);
+    accountRepository.save(user);
+}
+
+
+@Override
+@Transactional
+public UserDto updateUser(String login, UpdateUserDto updateUserDto) {
+    UserAccount user = accountRepository.findUserByLogin(login);
+    userValidator.updateFields(user, updateUserDto);
+    accountRepository.save(user);
+    return modelMapper.map(user, UserDto.class);
+}
+
+@Override
+@Transactional
+public UserDto removeUser(String login) {
+    UserAccount user = accountRepository.findUserByLogin(login);
+    accountRepository.delete(user);
+    return modelMapper.map(user, UserDto.class);
+}
 }

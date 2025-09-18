@@ -90,7 +90,6 @@ public class SecurityConfiguration {
                         .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR') or authentication.name == #login"))
 
 
-
                         // product endpoints
                         .requestMatchers(HttpMethod.GET, "/product", "/product/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/product").permitAll()

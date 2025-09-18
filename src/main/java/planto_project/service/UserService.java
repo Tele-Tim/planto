@@ -31,4 +31,5 @@ public interface UserService {
     Set<CartItemDto> deleteProductFromCart(String login, String productId);
 
     void clearUserCart(String login);
-}
+
+    }

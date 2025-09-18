@@ -70,6 +70,7 @@ public class UserController {
         return userService.addToCart(login, productId);
     }
 
+
     @DeleteMapping("/user/{login}/cart/{productId}")
     public Set<CartItemDto> removeFromCart(@PathVariable String login, @PathVariable String productId) {
         return userService.removeFromCart(login, productId);
