@@ -126,10 +126,20 @@ public class UserServiceImpl implements UserService, CommandLineRunner {
 
     @Override
     public Set<UserDto> findAllUsers() {
-        return accountRepository.findAll().stream()
-                .map(u -> modelMapper.map(u, UserDto.class))
+              List<UserAccount> users = accountRepository.findAll();
+        return users.stream()
+                .map(userAccount -> {
+                    UserDto userDto = modelMapper.map(userAccount, UserDto.class);
+                    List<OrderResponseDto> ordersDto = orderRepository.findAllByUser_Login(userAccount.getLogin())
+                            .stream()
+                            .map(order -> modelMapper.map(order, OrderResponseDto.class))
+                            .toList();
+                    userDto.setOrders(ordersDto);
+                    return userDto;
+                })
                 .collect(Collectors.toSet());
     }
+
 
     @Override
     public Set<CartItemDto> addToCart(String login, String productId) {

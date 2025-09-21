@@ -107,8 +107,8 @@ public class SecurityConfiguration {
                         .access(new WebExpressionAuthorizationManager("authentication.name == #login or hasRole('ADMINISTRATOR')"))
                         .requestMatchers(HttpMethod.PUT, "/order/{login}/**")
                         .access(new WebExpressionAuthorizationManager("authentication.name == #login or hasRole('ADMINISTRATOR')"))
-                        .requestMatchers(HttpMethod.DELETE, "/order/{login}/**")
-                        .access(new WebExpressionAuthorizationManager("authentication.name == #login or hasRole('ADMINISTRATOR')"))
+                        .requestMatchers(HttpMethod.DELETE, "/order/remove/**")
+                        .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
                         .requestMatchers("/orders")
                         .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
 

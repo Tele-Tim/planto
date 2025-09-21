@@ -3,6 +3,7 @@ package planto_project.dto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import planto_project.model.OrderStatus;
 
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Setter
 public class OrderResponseDto {
     private String id;
     private List<OrderItemDto> items;
@@ -19,5 +21,7 @@ public class OrderResponseDto {
     private String paymentMethod;
     private boolean paid;
     private UserDto user;
+
+
 }
 

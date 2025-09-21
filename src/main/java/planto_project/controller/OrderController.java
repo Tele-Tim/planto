@@ -30,7 +30,7 @@
             return orderService.findAllOrders();
         }
 
-        @GetMapping("/{login}")
+        @GetMapping("/{login}/orders")
         public List<OrderResponseDto> findAllOrdersOfUser(@PathVariable String login) {
             return orderService.findAllOrdersOfUser(login);
         }
@@ -41,7 +41,7 @@
             return orderService.updateOrder(orderId, orderUpdateDto);
         }
 
-        @DeleteMapping("/{login}/{orderId}")
+        @DeleteMapping("/remove/{orderId}")
         public OrderResponseDto removeOrder(@PathVariable String orderId) {
             return orderService.removeOrder(orderId);
         }

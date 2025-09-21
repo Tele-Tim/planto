@@ -8,10 +8,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import planto_project.dao.AccountRepository;
 import planto_project.dao.OrderRepository;
-import planto_project.dto.OrderCreateDto;
-import planto_project.dto.OrderResponseDto;
-import planto_project.dto.OrderUpdateDto;
-import planto_project.dto.SortingDto;
+import planto_project.dao.ProductRepository;
+import planto_project.dto.*;
 import planto_project.dto.filters_dto.DataForOrdersFiltersDto;
 import planto_project.dto.filters_dto.DataForProductsFiltersDto;
 import planto_project.model.Filter;
@@ -32,6 +30,7 @@ public class OrderServiceImpl implements OrderService, DataServices, DataForFilt
     final AccountRepository accountRepository;
     final OrderRepository orderRepository;
     final ModelMapper modelMapper;
+    final ProductRepository productRepository;
 
     @Override
     public OrderCreateDto createOrder(String userId, OrderCreateDto orderCreateDto) {
@@ -83,8 +82,27 @@ public class OrderServiceImpl implements OrderService, DataServices, DataForFilt
     @Override
     public Set<OrderResponseDto> findAllOrders() {
         return orderRepository.findAll().stream()
-                .map(o -> modelMapper.map(o, OrderResponseDto.class))
+                .map(this::convertToDto)
                 .collect(Collectors.toSet());
+    }
+
+    private OrderResponseDto convertToDto(Order order) {
+        OrderResponseDto dto = modelMapper.map(order, OrderResponseDto.class);
+        dto.setItems(
+                order.getItems().stream()
+                        .map(this::convertToOrderItemDto)
+                        .collect(Collectors.toList())
+        );
+        return dto;
+    }
+
+    private OrderItemDto convertToOrderItemDto(OrderItem orderItem) {
+        OrderItemDto dto = modelMapper.map(orderItem, OrderItemDto.class);
+        productRepository.findById(orderItem.getProductId()).ifPresent(product -> {
+            dto.setName(product.getName());
+            dto.setPriceUnit(product.getPrice());
+        });
+        return dto;
     }
 
     @Override
