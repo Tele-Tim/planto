@@ -6,10 +6,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.core.query.Query;
+import planto_project.model.CategoryCount;
 import planto_project.model.Product;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 public interface ProductRepository extends MongoRepository<Product, String>, CustomProductRepository {
     Product findProductById(String id);
@@ -20,6 +22,9 @@ public interface ProductRepository extends MongoRepository<Product, String>, Cus
     Page<Product> findProductsBy(Query query, Pageable pageable);
     Product getTop1ByOrderByPriceDesc();
 
-    @Aggregation("{$group: {_id: $category}}")
-    List<String> groupByCategory(Sort sort);
+    @Aggregation("{$group: {_id: '$category', count: {$sum: 1}}}")
+     List<CategoryCount> groupByCategory(Sort sort);
+
+    List<Product> getDistinctByQuantityGreaterThan(int i);
+    List<Product> getDistinctByQuantity(int i);
 }

@@ -12,10 +12,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import planto_project.dao.ProductRepository;
 import planto_project.dto.*;
-import planto_project.dto.filters_dto.DataForProductsFiltersDto;
-import planto_project.dto.filters_dto.FilterDoubleDto;
-import planto_project.dto.filters_dto.FilterDto;
-import planto_project.dto.filters_dto.FilterStringDto;
+import planto_project.dto.filters_dto.*;
+import planto_project.model.CategoryCount;
 import planto_project.model.Filter;
 import planto_project.model.Product;
 import planto_project.validator.ProductValidator;
@@ -138,9 +136,13 @@ public class ProductServiceImpl implements ProductService, DataServices, DataFor
     public DataForProductsFiltersDto getDataForFilters() {
 
         BigDecimal maxPrice = productRepository.getTop1ByOrderByPriceDesc().getPrice();
-        List<String> result = productRepository.groupByCategory(Sort.by("_id"));
+        Integer inStock = productRepository.getDistinctByQuantityGreaterThan(0).size();
+        Integer outStock = productRepository.getDistinctByQuantity(0).size();
+        List<CategoryCount> result = productRepository.groupByCategory(Sort.by("_id"));
 
-        return new DataForProductsFiltersDto(maxPrice, result);
+        List<CategoryDataDto> resultList = result.stream().map((categoryCount -> new CategoryDataDto(categoryCount.get_id(), categoryCount.getCount()))).toList();
+
+        return new DataForProductsFiltersDto(maxPrice, resultList, inStock, outStock);
     }
 
 
