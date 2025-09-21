@@ -27,6 +27,8 @@ public class Product {
     @Setter
     private String category;
     @Setter
+    private String idChapter;
+    @Setter
     private String description;
     @Indexed
     @Setter

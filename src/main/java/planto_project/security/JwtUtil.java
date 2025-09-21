@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 @Component
 public class JwtUtil {
 
-
     @Value("${planto.app.jwtSecret}")
     private String jwtSecret;
 

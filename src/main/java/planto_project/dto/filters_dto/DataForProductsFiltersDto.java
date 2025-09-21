@@ -5,11 +5,14 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 public class DataForProductsFiltersDto {
     BigDecimal price;
-    List<String> categories;
+    List<CategoryDataDto> categories;
+    Integer inStock;
+    Integer outStock;
 }
