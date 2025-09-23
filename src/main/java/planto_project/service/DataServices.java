@@ -43,7 +43,7 @@ public interface DataServices{
             } else {
                 filter = new Filter<>(filterDto.getField(),
                         filterDto.getType(),
-                        (String) filterDto.getValue());
+                        filterDto.getValue());
             }
 
             Criteria queryCriteria = filter.getCriteria();

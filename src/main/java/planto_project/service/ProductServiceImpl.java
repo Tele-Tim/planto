@@ -19,6 +19,7 @@ import planto_project.model.Product;
 import planto_project.validator.ProductValidator;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -77,57 +78,65 @@ public class ProductServiceImpl implements ProductService, DataServices, DataFor
         Sort.Direction direction = sortingDto.getDirection() > 0 ? Sort.Direction.ASC : Sort.Direction.DESC;
         Pageable pageable = PageRequest.of(sortingDto.getPage(), sortingDto.getSize(), Sort.by(direction, sortingDto.getField().toLowerCase()));
 
-        Filter<String> filterName = null;
-        Filter<String> filterCategory = null;
-        Filter<Double> filterPrice = null;
+        Map<String, Filter<?>> filterMap = Map.ofEntries(
+                Map.entry("name", new Filter<String>()),
+                Map.entry("category", new Filter<String>()),
+                Map.entry("price", new Filter<Double>()),
+                Map.entry("quantity", new Filter<Integer>())
+        );
 
-        List<FilterDto> filtersDto = sortingDto.getCriteria();
-        List<Criteria> criteries = new ArrayList<>();
-        for (FilterDto filterDto : filtersDto) {
-            String field = filterDto.getField();
-            if (field.equalsIgnoreCase("name")) {
-                filterName = new Filter<String>(filterDto.getField(),
-                        filterDto.getType(),
-                        (String) filterDto.getValue());
-                Criteria criteria = filterName.getCriteria();
-                if (criteria != null) {
-                    criteries.add(criteria);
-                }
-            }
-
-            else if (field.equalsIgnoreCase("price")
-                    && filterDto instanceof FilterDoubleDto filterDtoTmp) {
-
-                filterPrice = new Filter<Double>(filterDtoTmp.getField(),
-                        filterDtoTmp.getType(),
-                        filterDtoTmp.getValueFrom(),
-                        filterDtoTmp.getValueTo());
-
-                Criteria criteria = filterPrice.getCriteria();
-                if (criteria != null) {
-                    criteries.add(criteria);
-                }
-
-            }
-
-            else if (field.equalsIgnoreCase("category")
-                        && filterDto instanceof FilterStringDto filterDtoTmp) {
-
-                filterCategory = new Filter<String>(filterDtoTmp.getField(),
-                        filterDtoTmp.getType(),
-                        filterDtoTmp.getValueList());
-                Criteria criteria = filterCategory.getCriteria();
-                if (criteria != null) {
-                    criteries.add(criteria);
-                }
-
-            }
-        }
-
-        Query query = new Query();
-        if (!criteries.isEmpty()) {
-            query.addCriteria(new Criteria().andOperator(criteries));
-        }
+        Query query = getQueryWithCriteria(filterMap, sortingDto);
+//        Filter<String> filterName = null;
+//        Filter<String> filterCategory = null;
+//        Filter<Double> filterPrice = null;
+//
+//        List<FilterDto> filtersDto = sortingDto.getCriteria();
+//        List<Criteria> criteries = new ArrayList<>();
+//        for (FilterDto filterDto : filtersDto) {
+//            String field = filterDto.getField();
+//            if (field.equalsIgnoreCase("name")) {
+//                filterName = new Filter<String>(filterDto.getField(),
+//                        filterDto.getType(),
+//                        (String) filterDto.getValue());
+//                Criteria criteria = filterName.getCriteria();
+//                if (criteria != null) {
+//                    criteries.add(criteria);
+//                }
+//            }
+//
+//            else if (field.equalsIgnoreCase("price")
+//                    && filterDto instanceof FilterDoubleDto filterDtoTmp) {
+//
+//                filterPrice = new Filter<Double>(filterDtoTmp.getField(),
+//                        filterDtoTmp.getType(),
+//                        filterDtoTmp.getValueFrom(),
+//                        filterDtoTmp.getValueTo());
+//
+//                Criteria criteria = filterPrice.getCriteria();
+//                if (criteria != null) {
+//                    criteries.add(criteria);
+//                }
+//
+//            }
+//
+//            else if (field.equalsIgnoreCase("category")
+//                        && filterDto instanceof FilterStringDto filterDtoTmp) {
+//
+//                filterCategory = new Filter<String>(filterDtoTmp.getField(),
+//                        filterDtoTmp.getType(),
+//                        filterDtoTmp.getValueList());
+//                Criteria criteria = filterCategory.getCriteria();
+//                if (criteria != null) {
+//                    criteries.add(criteria);
+//                }
+//
+//            }
+//        }
+//
+//        Query query = new Query();
+//        if (!criteries.isEmpty()) {
+//            query.addCriteria(new Criteria().andOperator(criteries));
+//        }
 
         return productRepository.findProductsByQuery(query, pageable);
     }
@@ -144,6 +153,7 @@ public class ProductServiceImpl implements ProductService, DataServices, DataFor
 
         return new DataForProductsFiltersDto(maxPrice, resultList, inStock, outStock);
     }
+
 
 
 }
