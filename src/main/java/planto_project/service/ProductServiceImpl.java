@@ -86,58 +86,6 @@ public class ProductServiceImpl implements ProductService, DataServices, DataFor
         );
 
         Query query = getQueryWithCriteria(filterMap, sortingDto);
-//        Filter<String> filterName = null;
-//        Filter<String> filterCategory = null;
-//        Filter<Double> filterPrice = null;
-//
-//        List<FilterDto> filtersDto = sortingDto.getCriteria();
-//        List<Criteria> criteries = new ArrayList<>();
-//        for (FilterDto filterDto : filtersDto) {
-//            String field = filterDto.getField();
-//            if (field.equalsIgnoreCase("name")) {
-//                filterName = new Filter<String>(filterDto.getField(),
-//                        filterDto.getType(),
-//                        (String) filterDto.getValue());
-//                Criteria criteria = filterName.getCriteria();
-//                if (criteria != null) {
-//                    criteries.add(criteria);
-//                }
-//            }
-//
-//            else if (field.equalsIgnoreCase("price")
-//                    && filterDto instanceof FilterDoubleDto filterDtoTmp) {
-//
-//                filterPrice = new Filter<Double>(filterDtoTmp.getField(),
-//                        filterDtoTmp.getType(),
-//                        filterDtoTmp.getValueFrom(),
-//                        filterDtoTmp.getValueTo());
-//
-//                Criteria criteria = filterPrice.getCriteria();
-//                if (criteria != null) {
-//                    criteries.add(criteria);
-//                }
-//
-//            }
-//
-//            else if (field.equalsIgnoreCase("category")
-//                        && filterDto instanceof FilterStringDto filterDtoTmp) {
-//
-//                filterCategory = new Filter<String>(filterDtoTmp.getField(),
-//                        filterDtoTmp.getType(),
-//                        filterDtoTmp.getValueList());
-//                Criteria criteria = filterCategory.getCriteria();
-//                if (criteria != null) {
-//                    criteries.add(criteria);
-//                }
-//
-//            }
-//        }
-//
-//        Query query = new Query();
-//        if (!criteries.isEmpty()) {
-//            query.addCriteria(new Criteria().andOperator(criteries));
-//        }
-
         return productRepository.findProductsByQuery(query, pageable);
     }
 
