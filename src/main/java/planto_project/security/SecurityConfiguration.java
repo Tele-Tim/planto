@@ -91,7 +91,7 @@ public class SecurityConfiguration {
 
 
                         // product endpoints
-                        .requestMatchers(HttpMethod.GET, "/product", "/product/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/product", "/product/**", "/product/quantity/").permitAll()
                         .requestMatchers(HttpMethod.POST, "/product").permitAll()
                         .requestMatchers("/product/create", "/product/update/**", "/product/filterdata")
                         .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))

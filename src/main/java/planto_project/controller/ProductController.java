@@ -20,6 +20,11 @@ public class ProductController {
         return productService.createProduct(newProductDto);
     }
 
+    @GetMapping("/quantity/")
+    public int getQuantity() {
+        return  productService.getQuantity();
+    }
+
     @PostMapping()
     public Page<ProductDto> findAllProducts(@RequestBody SortingDto sortingDto) {
         if (!sortingDto.getCriteria().isEmpty()) {
