@@ -20,7 +20,7 @@ public class ProductController {
         return productService.createProduct(newProductDto);
     }
 
-    @GetMapping("/quantity/")
+    @GetMapping("/quantity")
     public int getQuantity() {
         return  productService.getQuantity();
     }
