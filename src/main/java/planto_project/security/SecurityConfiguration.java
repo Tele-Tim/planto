@@ -133,8 +133,9 @@ public class SecurityConfiguration {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOriginPatterns(Arrays.asList(
-                "http://localhost:*",
-                "https://localhost:*"
+//                "http://localhost:*",
+//                "https://localhost:*"
+                "https://planto-front.onrender.com"
         ));
 
 
