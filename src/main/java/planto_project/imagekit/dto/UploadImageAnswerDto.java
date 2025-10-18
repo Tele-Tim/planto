@@ -8,5 +8,6 @@ import lombok.Data;
 @Data
 public class UploadImageAnswerDto {
     private String url;
+    private boolean success;
     private String msg;
 }

@@ -24,4 +24,6 @@ public interface ProductService {
     Page<ProductDto> findAllProductsWithCriteria(SortingDto sortingDto);
 
     DataForProductsFiltersDto getDataForFilters();
+
+    int getQuantity();
 }

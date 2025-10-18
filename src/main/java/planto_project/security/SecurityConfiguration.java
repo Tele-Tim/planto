@@ -19,6 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import java.util.Arrays;
 
@@ -64,7 +65,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authorize -> authorize
 
                         // authentication endpoints
-                        .requestMatchers("/auth/login", "/auth/refresh", "auth/logout").permitAll()
+                        .requestMatchers("/auth/login", "/auth/refresh", "/auth/logout").permitAll()
 
                         // account endpoints
                         .requestMatchers("/account/register").permitAll()
@@ -91,7 +92,7 @@ public class SecurityConfiguration {
 
 
                         // product endpoints
-                        .requestMatchers(HttpMethod.GET, "/product", "/product/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/product", "/product/**", "/product/quantity").permitAll()
                         .requestMatchers(HttpMethod.POST, "/product").permitAll()
                         .requestMatchers("/product/create", "/product/update/**", "/product/filterdata")
                         .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
@@ -114,7 +115,7 @@ public class SecurityConfiguration {
 
                         //images endpoint
                         .requestMatchers("/uploadImage")
-                        .access(new WebExpressionAuthorizationManager("hasRole('ADMINISTRATOR')"))
+                        .access(new WebExpressionAuthorizationManager("hasRole('ADMIN') or hasRole('ADMINISTRATOR')"))
 
 
                         // for other requests
@@ -130,17 +131,27 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
+
         configuration.setAllowedOriginPatterns(Arrays.asList(
-                "http://localhost:[*]",
-                "https://localhost:[*]",
-                "https://planto-gp2i.onrender.com"
+//                "http://localhost:*",
+//                "https://localhost:*"
+                "https://planto-front.onrender.com"
         ));
+
+
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
+
         return source;
+    }
+
+    @Bean
+    public CorsFilter corsFilter() {
+        return new CorsFilter(corsConfigurationSource());
     }
 }

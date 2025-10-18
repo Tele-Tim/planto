@@ -102,6 +102,10 @@ public class ProductServiceImpl implements ProductService, DataServices, DataFor
         return new DataForProductsFiltersDto(maxPrice, resultList, inStock, outStock);
     }
 
+    @Override
+    public int getQuantity() {
+        return productRepository.findAll().size();
+    }
 
 
 }

@@ -4,38 +4,49 @@ import io.imagekit.sdk.ImageKit;
 import io.imagekit.sdk.config.Configuration;
 import io.imagekit.sdk.models.FileCreateRequest;
 import io.imagekit.sdk.models.results.Result;
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import planto_project.dto.FileDto;
 import planto_project.imagekit.dto.UploadImageAnswerDto;
 import planto_project.imagekit.model.ImageKitProperties;
 
 @Service
-@RequiredArgsConstructor
+
+@Slf4j
 public class ImageKitServiceImpl implements ImageKitService {
 
-    final ImageKitProperties imgkitProperties;
+    private final ImageKit imageKit;
+
+    public ImageKitServiceImpl(ImageKitProperties imgkitProperties) {
+        Configuration config = new Configuration(
+                imgkitProperties.getPublicKey(),
+                imgkitProperties.getPrivateKey(),
+                imgkitProperties.getUrlEndpoint()
+        );
+        this.imageKit = ImageKit.getInstance();
+        this.imageKit.setConfig(config);
+        log.info("Init ImageKit with url={}, pubKey={}, privKey exists? {}",
+                imgkitProperties.getUrlEndpoint(),
+                imgkitProperties.getPublicKey(),
+                imgkitProperties.getPrivateKey() != null);
+    }
 
     @Override
     public UploadImageAnswerDto uploadImage(FileDto fileDto) {
+        if (fileDto.getFile() == null || fileDto.getFileName() == null || fileDto.getFileName().isBlank()) {
+            return new UploadImageAnswerDto(null, false, "Invalid file data");
+        }
 
-        String publicKey = imgkitProperties.getPublicKey();
-        String privateKey = imgkitProperties.getPrivateKey();
-        String url = imgkitProperties.getUrlEndpoint();
-
-        ImageKit imageKit = ImageKit.getInstance();
-        Configuration config = new Configuration(publicKey, privateKey, url);
-        imageKit.setConfig(config);
-
-        byte[] imageBytes = null;
         try {
-            imageBytes = fileDto.getFile().getBytes();
+            final byte[] imageBytes = fileDto.getFile().getBytes();
             FileCreateRequest fileCreate = new FileCreateRequest(imageBytes, fileDto.getFileName());
-            Result result = ImageKit.getInstance().upload(fileCreate);
-            return new UploadImageAnswerDto(result.getUrl(), "");
+            Result result = imageKit.upload(fileCreate);
+
+            log.info("Image [{}] uploaded successfully: {}", fileDto.getFileName(), result.getUrl());
+            return new UploadImageAnswerDto(result.getUrl(), true, null);
         } catch (Exception e) {
-            String msg = e.getMessage();
-            return new UploadImageAnswerDto("", e.getMessage());
+            log.error("Error uploading image [{}]", fileDto.getFileName(), e);
+            return new UploadImageAnswerDto(null, false, "Failed to upload image");
         }
     }
 }
