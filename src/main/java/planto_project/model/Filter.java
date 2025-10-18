@@ -56,7 +56,19 @@ public class Filter<T> {
         }
 
         if (this.type == 2) {
-            return Criteria.where(this.field).gte(this.valueFrom).lte(this.valueTo);
+
+            Criteria criteria = Criteria.where(this.field);
+
+            if (this.valueFrom != null) {
+                return criteria.gte(this.valueFrom);
+            }
+
+            if (this.valueTo != null) {
+                return criteria.lte(this.valueTo);
+            }
+
+            return criteria;
+
         }
 
         if (this.type == 3
