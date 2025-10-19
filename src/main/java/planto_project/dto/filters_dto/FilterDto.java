@@ -1,7 +1,6 @@
 package planto_project.dto.filters_dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.AllArgsConstructor;
@@ -17,7 +16,7 @@ import java.util.List;
 @JsonSubTypes({
         @JsonSubTypes.Type(value = FilterStringDto.class, name ="string"),
         @JsonSubTypes.Type(value = FilterIntegerDto.class, name = "integer"),
-        @JsonSubTypes.Type(value = FilterDoubleDto.class, name = "double"),
+        @JsonSubTypes.Type(value = FilterBigDecimalDto.class, name = "double"),
         @JsonSubTypes.Type(value = FilterIntegerDto.class, name = "date")
         })
 @JsonIgnoreProperties(ignoreUnknown = true)
