@@ -12,16 +12,12 @@ import planto_project.dao.ProductRepository;
 import planto_project.dto.*;
 import planto_project.dto.filters_dto.DataForOrdersFiltersDto;
 import planto_project.dto.filters_dto.DataForProductsFiltersDto;
-import planto_project.model.Filter;
-import planto_project.model.Order;
-import planto_project.model.OrderItem;
-import planto_project.model.UserAccount;
+import planto_project.model.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -74,10 +70,56 @@ public class OrderServiceImpl implements OrderService, DataServices, DataForFilt
 
         List<Order> orders = orderRepository.findAllByUser_Login(userAccount.getLogin());
 
+        if (orders.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        Set<String> productIds = orders.stream()
+                .flatMap(o -> o.getItems().stream())
+                .map(OrderItem::getProductId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        final Map<String, Product> productById = productRepository.findAllById(productIds).stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.toMap(Product::getId, p -> p));
+
         return orders.stream()
-                .map(order -> modelMapper.map(order, OrderResponseDto.class))
-                .toList();
+                .map(order -> toOrderResponseDtoWithProductSnapshots(order, productById))
+                .collect(Collectors.toList());
     }
+
+    private OrderResponseDto toOrderResponseDtoWithProductSnapshots(Order order, Map<String, Product> productById) {
+        OrderResponseDto dto = new OrderResponseDto();
+        dto.setId(order.getId());
+        dto.setOrderDate(order.getOrderDate());
+        dto.setStatus(order.getStatus());
+        dto.setPaymentMethod(order.getPaymentMethod());
+        dto.setPaid(order.isPaid());
+
+        List<OrderItemDto> items = order.getItems().stream()
+                .map(item -> {
+                    OrderItemDto itDto = new OrderItemDto();
+                    itDto.setProductId(item.getProductId());
+                    itDto.setQuantity(item.getQuantity());
+
+                    Product product = productById.get(item.getProductId());
+                    if (product != null) {
+                        itDto.setName(product.getName());
+                        itDto.setPriceUnit(product.getPrice() != null ? product.getPrice() : BigDecimal.ZERO);
+                        itDto.setImageUrl(product.getImageUrl());
+                    } else {
+                        itDto.setName("Unknown product");
+                        itDto.setPriceUnit(BigDecimal.ZERO);
+                    }
+                    return itDto;
+                })
+                .collect(Collectors.toList());
+        dto.setItems(items);
+        return dto;
+    }
+
+
 
     @Override
     public Set<OrderResponseDto> findAllOrders() {
