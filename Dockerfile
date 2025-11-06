@@ -1,9 +1,6 @@
-FROM openjdk:17-jdk-slim AS builder
+FROM maven:3.8.8-eclipse-temurin-17 AS builder
 
 WORKDIR /app
-
-RUN apt-get update && \
-    apt-get install -y maven
 
 COPY pom.xml .
 
@@ -11,10 +8,9 @@ RUN mvn dependency:go-offline -B
 
 COPY src ./src
 
-RUN mvn clean package -DskipTest
+RUN mvn -DskipTests package -B
 
-
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jdk
 
 WORKDIR /app
 
@@ -24,4 +20,4 @@ EXPOSE 8080
 
 LABEL authors="tim_dev"
 
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar"]
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","app.jar"]
