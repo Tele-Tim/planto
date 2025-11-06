@@ -17,7 +17,7 @@ public class PingService {
         ping();
     }
 
-    @Scheduled(fixedDelay = 45000)
+    @Scheduled(fixedDelay = 30000)
     private void ping() {
         try{
             var response = restTemplate.getForEntity(RENDER_URL, String.class);
