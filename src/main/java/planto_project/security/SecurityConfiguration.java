@@ -119,6 +119,9 @@ public class SecurityConfiguration {
                         .access(new WebExpressionAuthorizationManager("hasRole('ADMIN') or hasRole('ADMINISTRATOR')"))
 
 
+                        // ping
+                        .requestMatchers("/health").permitAll()
+
                         // for other requests
                         .anyRequest().authenticated());
 

@@ -10,7 +10,7 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 public class PingService {
     private final RestTemplate restTemplate = new RestTemplate();
-    private final String RENDER_URL = "https://planto-gp2i.onrender.com";
+    private final String RENDER_URL = "https://planto-gp2i.onrender.com/health";
 
     @PostConstruct
     public void init() {
@@ -18,7 +18,7 @@ public class PingService {
     }
 
     @Scheduled(fixedDelay = 45000)
-    private void ping() {
+    public void ping() {
         try{
             var response = restTemplate.getForEntity(RENDER_URL, String.class);
             log.info("Ping successful, status: {}", response.getStatusCode());
