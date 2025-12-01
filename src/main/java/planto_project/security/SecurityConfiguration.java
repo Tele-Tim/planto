@@ -121,6 +121,7 @@ public class SecurityConfiguration {
 
                         // ping
                         .requestMatchers("/health").permitAll()
+                        .requestMatchers("/test").permitAll()
 
                         // for other requests
                         .anyRequest().authenticated());

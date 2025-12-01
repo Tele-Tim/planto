@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Set;
 
 @Slf4j
 @Component
@@ -29,12 +30,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
 
+    private static final Set<String> PUBLIC_URLS = Set.of(
+            "/auth/login",
+            "/auth/refresh",
+            "/auth/logout",
+            "/test",
+            "/health"
+    );
+
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getServletPath();
-        return HttpMethod.OPTIONS.matches(request.getMethod()) || path.equals("/auth/login")
-                || path.equals("/auth/refresh") || path.equals("/auth/logout");
+        return HttpMethod.OPTIONS.matches(request.getMethod())
+                || PUBLIC_URLS.contains(path);
     }
 
     @Override
