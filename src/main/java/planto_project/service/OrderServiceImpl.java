@@ -10,9 +10,10 @@ import planto_project.dao.AccountRepository;
 import planto_project.dao.OrderRepository;
 import planto_project.dao.ProductRepository;
 import planto_project.dto.*;
+import planto_project.dto.events.OrderCreatedEvents;
 import planto_project.dto.filters_dto.DataForOrdersFiltersDto;
-import planto_project.dto.filters_dto.DataForProductsFiltersDto;
 import planto_project.model.*;
+import planto_project.service.kafka.KafkaProducerService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -27,19 +28,68 @@ public class OrderServiceImpl implements OrderService, DataServices, DataForFilt
     final OrderRepository orderRepository;
     final ModelMapper modelMapper;
     final ProductRepository productRepository;
+    final KafkaProducerService kafkaProducerService;
 
     @Override
     public OrderCreateDto createOrder(String userId, OrderCreateDto orderCreateDto) {
+
         UserAccount user = accountRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
         Order order = new Order(
                 orderCreateDto.getItems().stream().map(i -> modelMapper.map(i, OrderItem.class)).toList(),
                 LocalDateTime.now(),
                 orderCreateDto.getPaymentMethod(),
                 false,
                 user);
-        return modelMapper.map(orderRepository.save(order), OrderCreateDto.class);
+
+        Order savedOrder = orderRepository.save(order);
+
+        sendOrderCreatedEventToKafka(savedOrder, user);
+
+        return modelMapper.map(savedOrder, OrderCreateDto.class);
     }
+
+    private void sendOrderCreatedEventToKafka(Order order, UserAccount user) {
+        try {
+            List<OrderCreatedEvents.OrderItemInfo> itemInfos = order.getItems().stream()
+                    .map(item -> {
+                        Product product = productRepository.findById(item.getProductId())
+                                .orElse(null);
+
+                        return new OrderCreatedEvents.OrderItemInfo(
+                                item.getProductId(),
+                                product != null ? product.getName() : "Unknown Product",
+                                item.getQuantity(),
+                                product != null && product.getPrice() != null
+                                        ? product.getPrice().doubleValue()
+                                        : 0.0
+                        );
+                    })
+                    .collect(Collectors.toList());
+
+            double totalAmount = itemInfos.stream()
+                    .mapToDouble(item -> item.getPriceUnit() * item.getQuantity())
+                    .sum();
+
+            OrderCreatedEvents event = new OrderCreatedEvents(
+                    order.getId(),
+                    user.getLogin(),
+                    user.getEmail(),
+                    itemInfos,
+                    order.getPaymentMethod(),
+                    order.getOrderDate(),
+                    totalAmount
+            );
+
+            kafkaProducerService.sendOrderCreatedEvent(event);
+
+        } catch (Exception e) {
+            System.err.println("Failed to send Kafka event for order: " + order.getId());
+            e.printStackTrace();
+        }
+    }
+
 
     @Override
     public OrderResponseDto findOrderById(String orderId) {
@@ -118,7 +168,6 @@ public class OrderServiceImpl implements OrderService, DataServices, DataForFilt
         dto.setItems(items);
         return dto;
     }
-
 
 
     @Override
