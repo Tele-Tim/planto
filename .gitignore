@@ -4,6 +4,18 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+
+# Kafka SSL Certificates
+src/main/resources/kafka-certs/*.p12
+src/main/resources/kafka-certs/*.jks
+src/main/resources/kafka-certs/*.key
+src/main/resources/kafka-certs/*.cert
+src/main/resources/kafka-certs/*.pem
+
+# Можно коммитить только README
+!src/main/resources/kafka-certs/README.md
+
+
 ### STS ###
 .apt_generated
 .classpath

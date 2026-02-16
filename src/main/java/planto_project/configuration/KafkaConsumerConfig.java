@@ -2,6 +2,7 @@ package planto_project.configuration;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,6 +26,15 @@ public class KafkaConsumerConfig {
     @Value("${spring.kafka.consumer.group-id}")
     private String groupId;
 
+    @Value("${spring.kafka.ssl.trust-store-password}")
+    private String truststorePassword;
+
+    @Value("${spring.kafka.ssl.key-store-password}")
+    private String keystorePassword;
+
+    @Autowired(required = false)
+    private KafkaSslConfig.KafkaCertificates kafkaCertificates;
+
     @Bean
     public ConsumerFactory<String, OrderCreatedEvents> consumerFactory() {
         Map<String, Object> config = new HashMap<>();
@@ -39,6 +49,16 @@ public class KafkaConsumerConfig {
         config.put(JsonDeserializer.VALUE_DEFAULT_TYPE, OrderCreatedEvents.class.getName());
         config.put(JsonDeserializer.USE_TYPE_INFO_HEADERS, false);
 
+
+        if (kafkaCertificates != null) {
+            config.put("security.protocol", "SSL");
+            config.put("ssl.truststore.location", kafkaCertificates.getTruststorePath());
+            config.put("ssl.truststore.password", truststorePassword);
+            config.put("ssl.keystore.location", kafkaCertificates.getKeystorePath());
+            config.put("ssl.keystore.password", keystorePassword);
+            config.put("ssl.keystore.type", "PKCS12");
+        }
+
         return new DefaultKafkaConsumerFactory<>(
                 config,
                 new StringDeserializer(),
@@ -46,7 +66,7 @@ public class KafkaConsumerConfig {
         );
     }
 
-       @Bean
+    @Bean
     public ConcurrentKafkaListenerContainerFactory<String, OrderCreatedEvents> kafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, OrderCreatedEvents> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
