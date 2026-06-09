@@ -125,16 +125,25 @@ public class AuthServiceImpl implements AuthService {
 //        httpServletResponse.addCookie(cookie);
 //
 
-        String cookieValue = refreshCookieName + "=" + "" +
+//        String cookieValue = refreshCookieName + "=" + "" +
+//                "; Path=/" +
+//                "; HttpOnly" +
+//                "; Secure" +
+//                "; SameSite=None" +
+//                "; Max-Age=0";
+//
+//        httpServletResponse.setHeader("Set-Cookie", cookieValue);
+//
+//        System.out.println("Sending cookie: " + cookieValue);
+        String cookieValue = refreshCookieName + "=" +
                 "; Path=/" +
                 "; HttpOnly" +
                 "; Secure" +
                 "; SameSite=None" +
                 "; Max-Age=0";
 
-        httpServletResponse.setHeader("Set-Cookie", cookieValue);
+        httpServletResponse.addHeader("Set-Cookie", cookieValue);
 
-        System.out.println("Sending cookie: " + cookieValue);
     }
 
 
@@ -149,13 +158,22 @@ public class AuthServiceImpl implements AuthService {
 //        cookie.setMaxAge(maxAge);
 //        httpServletResponse.addCookie(cookie);
 
+//        String cookieValue = refreshCookieName + "=" + token +
+//                "; Path=/" +
+//                "; HttpOnly" +
+//                "; Secure" +
+//                "; SameSite=None" +
+//                "; Max-Age=" + maxAge;
+//        httpServletResponse.setHeader("Set-Cookie", cookieValue);
+
         String cookieValue = refreshCookieName + "=" + token +
                 "; Path=/" +
                 "; HttpOnly" +
                 "; Secure" +
                 "; SameSite=None" +
                 "; Max-Age=" + maxAge;
-        httpServletResponse.setHeader("Set-Cookie", cookieValue);
+
+        httpServletResponse.addHeader("Set-Cookie", cookieValue);
 
     }
 
