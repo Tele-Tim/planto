@@ -64,6 +64,8 @@ public class SecurityConfiguration {
 
                 .authorizeHttpRequests(authorize -> authorize
 
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
                         // authentication endpoints
                         .requestMatchers("/auth/login", "/auth/refresh", "/auth/logout").permitAll()
 
@@ -142,6 +144,10 @@ public class SecurityConfiguration {
                 "https://planto-front.onrender.com"
         ));
 
+        configuration.setAllowedMethods(Arrays.asList(
+                "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"
+        ));
+
         configuration.setAllowedHeaders(Arrays.asList(
                 "Authorization",
                 "Content-Type",
@@ -149,16 +155,12 @@ public class SecurityConfiguration {
                 "Origin"
         ));
 
-        configuration.setAllowedMethods(Arrays.asList(
-                "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"
-        ));
-
+        configuration.setExposedHeaders(Arrays.asList("Set-Cookie"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
-
         return source;
     }
 
